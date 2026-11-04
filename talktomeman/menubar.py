@@ -4,15 +4,19 @@
 Menu: pause/resume, toggle Ollama smart cleanup, quit.
 """
 
+import math
 import threading
 
 import rumps
 from pynput import keyboard
 
-from . import config, core
+from . import config, core, icons
 from .overlay import Overlay
 
+# emoji titles are only a fallback if SF Symbols aren't available
 IDLE, BUSY, REC, OFF = "🎙", "⏳", "🔴", "⏸"
+SYMBOLS = {"loading": "mic", "idle": "mic", "off": "mic.slash", "error": "exclamationmark.triangle"}
+FALLBACK = {"loading": BUSY, "idle": IDLE, "rec": REC, "off": OFF, "error": "⚠️"}
 
 
 class DictateApp(rumps.App):
@@ -21,6 +25,9 @@ class DictateApp(rumps.App):
         self.enabled = True
         self.listener = None
         self.ready = False
+        self.failed = False
+        self.icon_state = None
+        self.frame = 0
         self.overlay = Overlay()
 
         self.status = rumps.MenuItem("Loading models...")
@@ -40,7 +47,7 @@ class DictateApp(rumps.App):
             self.ready = True
             self.status.title = "Ready: hold Right Option to dictate"
         except Exception as e:
-            self.title = "⚠️"
+            self.failed = True
             self.status.title = f"Error: {e}"
 
     def start_listener(self):
@@ -49,15 +56,48 @@ class DictateApp(rumps.App):
         )
         self.listener.start()
 
+    def _button(self):
+        try:
+            return self._nsapp.nsstatusitem.button()
+        except Exception:
+            return None
+
+    def _state(self) -> str:
+        if self.failed:
+            return "error"
+        if not self.ready:
+            return "loading"
+        if not self.enabled:
+            return "off"
+        return "rec" if core.recording else "idle"
+
+    def _apply_icon(self, state: str) -> None:
+        """Set the menu bar icon; falls back to an emoji title without SF Symbols."""
+        button = self._button()
+        img = icons.symbol(SYMBOLS[state]) if state in SYMBOLS else None
+        if state == "rec":
+            levels = self.overlay.view.levels if self.overlay.view else [0.0] * icons.WAVE_BARS
+            step = max(1, len(levels) // icons.WAVE_BARS)
+            img = icons.waveform(levels[1::step])
+        if button is not None and img is not None:
+            button.setImage_(img)
+            self.title = ""
+        else:
+            self.title = FALLBACK[state]
+
     @rumps.timer(1 / 60)
     def refresh_ui(self, _):
-        """Update icon and waveform overlay on the main thread, from the real recording state."""
-        if not self.ready:
-            return
-        self.overlay.update(core.recording, core.level, core.pending > 0, core.done_count)
-        title = OFF if not self.enabled else REC if core.recording else IDLE
-        if title != self.title:
-            self.title = title
+        """Update icon and waveform overlay on the main thread, from the real state."""
+        self.frame += 1
+        if self.ready:
+            self.overlay.update(core.recording, core.level, core.pending > 0, core.done_count)
+        state = self._state()
+        if state != self.icon_state or (state == "rec" and self.frame % 3 == 0):
+            self.icon_state = state
+            self._apply_icon(state)
+        button = self._button()
+        if button is not None:  # gentle pulse while the models load
+            button.setAlphaValue_(0.45 + 0.35 * (0.5 + 0.5 * math.sin(self.frame / 9)) if state == "loading" else 1.0)
 
     @rumps.timer(5)
     def check_listener(self, _):
