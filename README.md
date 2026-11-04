@@ -11,7 +11,13 @@ No cloud, no subscription, nothing leaves your machine.
   transcribes, and a check mark when the text is pasted. Start and stop sounds too.
 - **Spoken punctuation edits:** after dictating, say "comma", "full stop", "question mark", "quotes"... as a
   separate dictation to fix the previous text.
-- **Menu bar app:** an Option-key (⌥) icon that turns bold while recording, plus pause and Smart-cleanup toggles.
+- **Menu bar app:** an Option-key (⌥) icon that turns bold while recording. The menu has:
+  - **Recent dictations:** your last 5, click one to copy it (kept in memory only, cleared when the app quits).
+  - **Pause dictation** and **Smart cleanup** toggles (the cleanup choice is remembered).
+  - **Microphone:** pick an input device, or use the system default.
+  - **Launch at login**, **Edit vocabulary...** (your Whisper word list), **Show log** and **About**.
+  - A status line at the top that only appears when something needs attention: loading, an error, or a
+    missing Accessibility / Input Monitoring permission (click it to open the right System Settings page).
 - **Ollama status light:** a small dot on the icon's top-right corner: green = Ollama ready, orange (pulsing) =
   starting, red = not running (self-correction cleanup is skipped). Hover it for a tooltip. The app loads the
   model for you as soon as Ollama comes up.
@@ -57,7 +63,8 @@ Optional: add Dictate.app to Login Items. Ollama started via `brew services` alr
 - Menu bar look: `MENU_ICON` (`"option"`, `"bubble"` or `"waveform"`) and `OLLAMA_INDICATOR`
   (`"dot"` for the coloured light, `"badge"` for a monochrome corner badge plus a line in the menu)
 - Your own names and jargon for Whisper: one per line in `~/.config/talktomeman/words.txt`
-- Log of the menu bar app: `/tmp/dictate.log`
+- Log of the menu bar app: `/tmp/dictate.log` (or Show log in the menu)
+- Choices made in the menu are stored in `~/.config/talktomeman/settings.json`
 
 ## Layout
 
@@ -71,6 +78,7 @@ talktomeman/
   overlay.py        floating waveform pill (listening, thinking, done)
   icons.py          menu bar icons
   menubar.py        rumps menu bar app
+  settings.py       saves menu choices (microphone, Smart cleanup) to ~/.config/talktomeman/settings.json
 scripts/            build_app.sh, make_icon.py
 tests/              pytest suite for textproc
 dictate_menubar.py  legacy launcher path for an already-built Dictate.app; safe to delete after rebuilding it
