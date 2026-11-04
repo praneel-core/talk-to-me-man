@@ -5,6 +5,7 @@ a worker thread does the slow work (mic, sounds) so the listener never blocks
 (macOS silently disables an event tap whose callback stalls).
 """
 
+import collections
 import queue
 import re
 import subprocess
@@ -22,6 +23,7 @@ from .llm import llm_cleanup, warm_up_model
 
 kb = keyboard.Controller()
 last_paste: tuple[str, float] | None = None  # (text as pasted, time)
+history: collections.deque[str] = collections.deque(maxlen=5)  # recent dictations, newest first (memory only)
 frames: list[np.ndarray] = []
 stream: sd.InputStream | None = None
 recording = False
@@ -88,12 +90,15 @@ def _transcribe_and_paste(audio: np.ndarray) -> None:
         if edited is not None:
             replace_last(last_paste[0], edited)
             last_paste = (edited, time.time())
+            if history:
+                history[0] = edited.strip()
             done_count += 1
             print(f"[{time.time() - t0:.2f}s] edit -> {edited!r}", flush=True)
             return
     text = llm_cleanup(text)
     paste(text)
     last_paste = (text + " ", time.time())
+    history.appendleft(text)
     done_count += 1
     print(f"[{time.time() - t0:.2f}s] {text}", flush=True)
 
@@ -123,6 +128,17 @@ def on_audio(indata, frame_count, time_info, status):
     level = float(np.sqrt(np.mean(indata**2)))
 
 
+def _input_device() -> int | None:
+    """Index of the microphone picked in the menu, or None for the system default."""
+    name = config.INPUT_DEVICE
+    if not name:
+        return None
+    for i, d in enumerate(sd.query_devices()):
+        if d["max_input_channels"] > 0 and d["name"] == name:
+            return i
+    return None
+
+
 def _do_press():
     global stream, recording, pressing
     with lock:
@@ -130,13 +146,21 @@ def _do_press():
             return
         frames.clear()
         try:
-            stream = sd.InputStream(
-                samplerate=config.SAMPLE_RATE,
-                channels=1,
-                dtype="float32",
-                callback=on_audio,
-            )
-            stream.start()
+            chosen = _input_device()
+            for device in ([chosen, None] if chosen is not None else [None]):
+                try:
+                    stream = sd.InputStream(
+                        samplerate=config.SAMPLE_RATE,
+                        channels=1,
+                        dtype="float32",
+                        callback=on_audio,
+                        device=device,
+                    )
+                    stream.start()
+                    break
+                except Exception:
+                    if device is None:
+                        raise  # the default failed too (e.g. permission denied)
         except Exception as e:
             # e.g. mic permission denied; don't leave `recording` stuck on
             print(f"(could not start recording: {e})", flush=True)
