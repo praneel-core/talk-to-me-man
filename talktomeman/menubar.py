@@ -8,9 +8,11 @@ import math
 import threading
 
 import rumps
+from AppKit import NSColor
 from pynput import keyboard
 
 from . import config, core, icons
+from .ollama_status import OllamaMonitor
 from .overlay import Overlay
 
 # emoji titles are only a fallback if SF Symbols aren't available
@@ -28,20 +30,24 @@ class DictateApp(rumps.App):
         self.icon_state = None
         self.frame = 0
         self.overlay = Overlay()
+        self.ollama = OllamaMonitor()
+        self.ollama_shown = None
 
         self.status = rumps.MenuItem("Loading models...")
         self.toggle = rumps.MenuItem("Enabled", callback=self.on_toggle)
         self.toggle.state = 1
         self.llm_item = rumps.MenuItem("Smart cleanup (Ollama)", callback=self.on_llm)
         self.llm_item.state = 1 if config.USE_LLM else 0
-        self.menu = [self.status, None, self.toggle, self.llm_item, None]
+        self.ollama_item = rumps.MenuItem("Ollama: checking...", callback=lambda _: None)
+        self.menu = [self.status, self.ollama_item, None, self.toggle, self.llm_item, None]
 
+        self.ollama.start()
         threading.Thread(target=self.load, daemon=True).start()
 
     def load(self):
         """Warm up the models in the background, then start the hotkey listener."""
         try:
-            core.warm_up()
+            core.warm_up(llm=False)  # Ollama is warmed by the monitor
             self.start_listener()
             self.ready = True
             self.status.title = "Ready: hold Right Option to dictate"
@@ -75,10 +81,34 @@ class DictateApp(rumps.App):
             return "off"
         return "rec" if self._active() else "idle"
 
-    def _apply_icon(self, state: str) -> None:
+    def _ollama_state(self) -> str:
+        return self.ollama.state if config.USE_LLM else "disabled"
+
+    def _badge(self) -> str | None:
+        """Corner badge on the icon, only when Smart cleanup is on but not ready."""
+        return {"off": "dot", "starting": "ring"}.get(self._ollama_state())
+
+    def _update_ollama_item(self) -> None:
+        st = self._ollama_state()
+        if st == self.ollama_shown:
+            return
+        self.ollama_shown = st
+        title, color = {
+            "ready": ("Ollama ready", NSColor.systemGreenColor()),
+            "starting": ("Ollama starting...", NSColor.systemOrangeColor()),
+            "off": ("Ollama not running (cleanup skipped)", NSColor.systemGrayColor()),
+            "disabled": ("Smart cleanup off", NSColor.systemGrayColor()),
+        }[st]
+        self.ollama_item.title = title
+        try:
+            self.ollama_item._menuitem.setImage_(icons.status_dot(color))
+        except Exception:
+            pass
+
+    def _apply_icon(self, state: str, badge: str | None) -> None:
         """Set the menu bar icon; falls back to an emoji title without SF Symbols."""
         button = self._button()
-        img = icons.image_for(config.MENU_ICON, state)
+        img = icons.image_for(config.MENU_ICON, state, badge)
         if button is not None and img is not None:
             button.setImage_(img)
             self.title = ""
@@ -91,10 +121,11 @@ class DictateApp(rumps.App):
         self.frame += 1
         if self.ready:
             self.overlay.update(self._active(), core.level, core.pending > 0, core.done_count)
-        state = self._state()
-        if state != self.icon_state:
-            self.icon_state = state
-            self._apply_icon(state)
+        state, badge = self._state(), self._badge()
+        self._update_ollama_item()
+        if (state, badge) != self.icon_state:
+            self.icon_state = (state, badge)
+            self._apply_icon(state, badge)
         button = self._button()
         if button is not None:  # gentle pulse while loading, dimmed when paused
             if state == "loading":

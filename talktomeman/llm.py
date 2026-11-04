@@ -41,3 +41,9 @@ def llm_cleanup(text: str) -> str:
         print(f"(LLM cleanup rejected, too different: {out})", flush=True)
         return text
     return out
+
+
+def warm_up_model() -> None:
+    """Load the Ollama model into memory (uses text with a correction cue so the
+    request really reaches the model)."""
+    llm_cleanup("can we meet on tuesday no wednesday")
