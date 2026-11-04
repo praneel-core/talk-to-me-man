@@ -22,6 +22,21 @@ No cloud, no subscription, nothing leaves your machine.
   starting, red = not running (self-correction cleanup is skipped). Hover it for a tooltip. The app loads the
   model for you as soon as Ollama comes up.
 
+## How it works
+
+![Flow of a dictation, from holding the key to the pasted text](docs/flow.svg)
+
+1. **Hold Right Option.** The mic opens, a start sound plays and the waveform pill appears. The key listener only queues the event; a worker thread does the slow work, so the hotkey never freezes.
+2. **Release.** The mic closes and the audio stays in memory. It is never written to disk or sent anywhere.
+3. **Speech check.** A quick loudness check drops silence and noise, because Whisper invents text for them.
+4. **Whisper** (`mlx-whisper`, on-device) turns the audio into text. A short prompt with your word list helps it spell names and jargon.
+5. **Quick cleanup** removes "um" and "uh" and tidies spacing.
+6. **Spoken punctuation.** If the whole dictation is a command like "comma" or "quotes" and you dictated within the last 2 minutes, the previous text is re-pasted with that fix and nothing else happens.
+7. **Correction cue.** If the text contains a cue such as "no", "I mean" or a repeated phrase, a local Ollama model removes the mistaken part. It is told to change nothing else, and a safety check keeps your original text if it rewords too much. If Ollama is off, your text is kept as it is.
+8. **Paste.** The text goes in through the clipboard (Cmd+V), the clipboard is restored, a check mark appears and the text is added to Recent dictations.
+
+Edit the diagram with `python scripts/make_flow.py` (it rewrites `docs/flow.svg`).
+
 ## Requirements
 
 macOS on Apple Silicon, Python 3.10+, and (optional) Ollama with `qwen2.5:3b`.
@@ -79,7 +94,7 @@ talktomeman/
   icons.py          menu bar icons
   menubar.py        rumps menu bar app
   settings.py       saves menu choices (microphone, Smart cleanup) to ~/.config/talktomeman/settings.json
-scripts/            build_app.sh, make_icon.py
+scripts/            build_app.sh, make_icon.py, make_flow.py (regenerates docs/flow.svg)
 tests/              pytest suite for textproc
 dictate_menubar.py  legacy launcher path for an already-built Dictate.app; safe to delete after rebuilding it
 ```

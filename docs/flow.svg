@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 830 940" width="830" height="940" role="img" aria-label="Flow of a dictation: hold key, record, check for speech, transcribe, clean up, optional punctuation edit or Ollama correction, paste">
+<style>
+:root{--fill:#f6f8fa;--stroke:#8c959f;--text:#1f2328;--sub:#59636e;--accent:#0969da;--accentfill:#ddf4ff}
+@media (prefers-color-scheme:dark){:root{--fill:#161b22;--stroke:#6e7681;--text:#e6edf3;--sub:#9198a1;--accent:#58a6ff;--accentfill:#10243e}}
+text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}
+.box{fill:var(--fill);stroke:var(--stroke);stroke-width:1.4}
+.accent{fill:var(--accentfill);stroke:var(--accent);stroke-width:1.6}
+.ghost{fill:none;stroke:var(--stroke);stroke-width:1.2}
+.t{font-size:15px;font-weight:600;fill:var(--text)}
+.s{font-size:11.5px;fill:var(--sub)}
+.accentt{fill:var(--accent)}
+.lbl{font-size:11.5px;font-weight:600;fill:var(--sub)}
+.ln{stroke:var(--stroke);stroke-width:1.6}
+.head{fill:var(--stroke)}
+</style>
+<rect class="accent" x="150.0" y="24" width="300" height="58" rx="12"/>
+<text class="t accentt" x="300" y="49.0" text-anchor="middle">Hold Right Option</text>
+<text class="s accents" x="300" y="68.0" text-anchor="middle">mic opens, start sound, waveform pill</text>
+<rect class="box" x="150.0" y="112" width="300" height="58" rx="12"/>
+<text class="t boxt" x="300" y="137.0" text-anchor="middle">Release the key</text>
+<text class="s boxs" x="300" y="156.0" text-anchor="middle">mic closes, the audio stays in memory</text>
+<rect class="box" x="150.0" y="200" width="300" height="58" rx="12"/>
+<text class="t boxt" x="300" y="225.0" text-anchor="middle">Check there is speech</text>
+<text class="s boxs" x="300" y="244.0" text-anchor="middle">silence and noise never reach Whisper</text>
+<rect class="ghost" stroke-dasharray="5 4" x="555.0" y="206" width="200" height="46" rx="12"/>
+<text class="t ghostt" x="655" y="225.0" text-anchor="middle">Ignored</text>
+<text class="s ghosts" x="655" y="244.0" text-anchor="middle">nothing is pasted</text>
+<rect class="box" x="150.0" y="288" width="300" height="58" rx="12"/>
+<text class="t boxt" x="300" y="313.0" text-anchor="middle">Whisper transcribes</text>
+<text class="s boxs" x="300" y="332.0" text-anchor="middle">on-device mlx-whisper, with your word list</text>
+<rect class="box" x="150.0" y="376" width="300" height="58" rx="12"/>
+<text class="t boxt" x="300" y="401.0" text-anchor="middle">Quick cleanup</text>
+<text class="s boxs" x="300" y="420.0" text-anchor="middle">removes um and uh, tidies spacing</text>
+<polygon class="box" points="300,462 445.0,512.0 300,562 155.0,512.0"/>
+<text class="t" x="300" y="509.0" text-anchor="middle">Spoken punctuation?</text>
+<text class="s" x="300" y="527.0" text-anchor="middle">“comma”, “full stop”, “quotes”</text>
+<rect class="box" x="530.0" y="484" width="250" height="56" rx="12"/>
+<text class="t boxt" x="655" y="508.0" text-anchor="middle">Edit the previous text</text>
+<text class="s boxs" x="655" y="527.0" text-anchor="middle">within 2 min, re-pasted with the fix</text>
+<polygon class="box" points="300,590 445.0,640.0 300,690 155.0,640.0"/>
+<text class="t" x="300" y="637.0" text-anchor="middle">Correction cue?</text>
+<text class="s" x="300" y="655.0" text-anchor="middle">“no”, “I mean”, repeated words</text>
+<rect class="accent" x="530.0" y="606" width="250" height="58" rx="12"/>
+<text class="t accentt" x="655" y="631.0" text-anchor="middle">Ollama fixes the correction</text>
+<text class="s accents" x="655" y="650.0" text-anchor="middle">local model; if off, your text is kept</text>
+<rect class="box" x="530.0" y="692" width="250" height="58" rx="12"/>
+<text class="t boxt" x="655" y="717.0" text-anchor="middle">Safety check</text>
+<text class="s boxs" x="655" y="736.0" text-anchor="middle">reworded too much? keep your text</text>
+<rect class="box" x="150.0" y="784" width="300" height="58" rx="12"/>
+<text class="t boxt" x="300" y="809.0" text-anchor="middle">Paste into the focused app</text>
+<text class="s boxs" x="300" y="828.0" text-anchor="middle">Cmd+V via the clipboard, which is then restored</text>
+<rect class="accent" x="150.0" y="870" width="300" height="58" rx="12"/>
+<text class="t accentt" x="300" y="895.0" text-anchor="middle">Check mark appears</text>
+<text class="s accents" x="300" y="914.0" text-anchor="middle">saved to Recent dictations</text>
+<path class="ln" d="M300.0,82.0 L300.0,104.8" fill="none"/>
+<polygon class="head" points="300.0,112.0 295.8,103.0 304.2,103.0"/>
+<path class="ln" d="M300.0,170.0 L300.0,192.8" fill="none"/>
+<polygon class="head" points="300.0,200.0 295.8,191.0 304.2,191.0"/>
+<path class="ln" d="M300.0,258.0 L300.0,280.8" fill="none"/>
+<polygon class="head" points="300.0,288.0 295.8,279.0 304.2,279.0"/>
+<text class="s lbl" x="308" y="278">speech</text>
+<path class="ln" d="M450.0,229.0 L547.8,229.0" fill="none" stroke-dasharray="4 4"/>
+<polygon class="head" points="555.0,229.0 546.0,233.2 546.0,224.8"/>
+<text class="s lbl" x="464.0" y="222">no speech</text>
+<path class="ln" d="M300.0,346.0 L300.0,368.8" fill="none"/>
+<polygon class="head" points="300.0,376.0 295.8,367.0 304.2,367.0"/>
+<path class="ln" d="M300.0,434.0 L300.0,454.8" fill="none"/>
+<polygon class="head" points="300.0,462.0 295.8,453.0 304.2,453.0"/>
+<path class="ln" d="M300.0,562.0 L300.0,582.8" fill="none"/>
+<polygon class="head" points="300.0,590.0 295.8,581.0 304.2,581.0"/>
+<text class="s lbl" x="308" y="576">no</text>
+<path class="ln" d="M445.0,512.0 L522.8,512.0" fill="none"/>
+<polygon class="head" points="530.0,512.0 521.0,516.2 521.0,507.8"/>
+<text class="s lbl" x="460" y="504">yes</text>
+<path class="ln" d="M300.0,690.0 L300.0,776.8" fill="none"/>
+<polygon class="head" points="300.0,784.0 295.8,775.0 304.2,775.0"/>
+<text class="s lbl" x="308" y="714">no</text>
+<path class="ln" d="M445.0,640.0 L522.8,640.0" fill="none"/>
+<polygon class="head" points="530.0,640.0 521.0,644.2 521.0,635.8"/>
+<path class="ln" d="M655.0,664.0 L655.0,684.8" fill="none"/>
+<polygon class="head" points="655.0,692.0 650.8,683.0 659.2,683.0"/>
+<path class="ln" d="M655.0,750.0 L655.0,813.0 L457.2,813.0" fill="none"/>
+<polygon class="head" points="450.0,813.0 459.0,808.8 459.0,817.2"/>
+<path class="ln" d="M780.0,512.0 L806.0,512.0 L806.0,899.0 L457.2,899.0" fill="none"/>
+<polygon class="head" points="450.0,899.0 459.0,894.8 459.0,903.2"/>
+<path class="ln" d="M300.0,842.0 L300.0,862.8" fill="none"/>
+<polygon class="head" points="300.0,870.0 295.8,861.0 304.2,861.0"/>
+<text class="s lbl" x="460" y="632">yes</text>
+</svg>
