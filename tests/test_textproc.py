@@ -1,6 +1,6 @@
 import pytest
 
-from dictate import textproc
+from holdspeak import textproc
 
 
 @pytest.mark.parametrize(

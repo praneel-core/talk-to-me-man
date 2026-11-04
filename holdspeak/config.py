@@ -6,7 +6,6 @@ from pynput import keyboard
 
 # --- hotkey / audio ---
 HOTKEY = keyboard.Key.alt_r  # hold to talk (right Option)
-RIGHT_OPTION_KEYCODE = 61  # same key, as macOS reports it (used by the watchdog)
 SAMPLE_RATE = 16000
 MIN_SECONDS = 0.4  # ignore accidental taps
 MAX_SECONDS = 120  # hard cap on one recording
@@ -62,8 +61,8 @@ EDIT_WINDOW = 120  # seconds after a paste during which commands apply to it
 
 # --- custom vocabulary ---
 # Words Whisper often gets wrong. Add your own names/jargon, one per line, to
-# ~/.config/dictate/words.txt (kept out of the repo).
-USER_WORDS_FILE = Path.home() / ".config" / "dictate" / "words.txt"
+# ~/.config/holdspeak/words.txt (kept out of the repo).
+USER_WORDS_FILE = Path.home() / ".config" / "holdspeak" / "words.txt"
 DEFAULT_WORDS = [
     "ChatGPT", "Claude", "Anthropic", "OpenAI", "Gemini", "Ollama", "Whisper",
     "GitHub", "VS Code", "Notion", "Slack", "Jira", "Confluence", "Zoom",

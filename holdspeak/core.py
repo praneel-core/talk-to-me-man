@@ -16,7 +16,6 @@ import numpy as np
 import pyperclip
 import sounddevice as sd
 from pynput import keyboard
-from Quartz import CGEventSourceKeyState, kCGEventSourceStateCombinedSessionState
 
 from . import config, textproc
 from .llm import llm_cleanup
@@ -97,28 +96,12 @@ def play_sound(name: str) -> None:
     )
 
 
-def _right_option_down() -> bool:
-    """Ask macOS directly whether Right Option is physically held."""
-    return bool(
-        CGEventSourceKeyState(
-            kCGEventSourceStateCombinedSessionState, config.RIGHT_OPTION_KEYCODE
-        )
-    )
-
-
 def _watchdog() -> None:
-    """Safety net: if the key-release event is ever missed, stop recording
-    once the key is no longer held (or after MAX_SECONDS)."""
+    """Safety net: never let one recording run longer than MAX_SECONDS."""
     start = time.time()
-    misses = 0
     while recording:
-        time.sleep(0.15)
-        try:
-            misses = 0 if _right_option_down() else misses + 1
-        except Exception as e:
-            print(f"(watchdog error: {e})", flush=True)
-            misses = 0
-        if recording and (misses >= 3 or time.time() - start > config.MAX_SECONDS):
+        time.sleep(0.5)
+        if recording and time.time() - start > config.MAX_SECONDS:
             _events.put("release")
             return
 
