@@ -45,6 +45,7 @@ PAD = 14  # transparent margin around the pill so the springs can overshoot
 BARS = 11
 BAR_W, GAP = 4.0, 4.0
 DOT_R, DOT_GAP = 3.0, 9.0
+IDLE_H = 2.5  # height of the bars when nothing is heard
 BOTTOM_MARGIN = 90
 
 ATTACK, RELEASE = 0.55, 0.10  # loudness envelope: rises fast, falls slowly
@@ -109,18 +110,22 @@ class _WaveView(NSView):
         x0 = (w - total) / 2
         for i, lv in enumerate(self.levels):
             bx = x0 + i * (BAR_W + GAP)
-            bh = BAR_W + lv * (HEIGHT - 14 - BAR_W)  # idle bars are round dots
+            # silent bars flatten into one thin continuous line (they widen to touch
+            # each other) instead of a row of dots; they separate as you get louder
+            widen = GAP * (1 - min(1.0, lv * 6)) * (1 - m)
+            bh = IDLE_H + lv * (HEIGHT - 14 - IDLE_H)
+            bx -= widen / 2
             if i in _DOT_BARS:
                 k = _DOT_BARS.index(i)
                 pulse = 0.5 + 0.5 * math.sin(self.phase * 4.5 - k * 1.1)
                 dot_d = 2 * DOT_R * (0.85 + 0.3 * pulse)
                 dot_x = w / 2 + (k - 1) * DOT_GAP - dot_d / 2
-                bw = _lerp(BAR_W, dot_d, m)
+                bw = _lerp(BAR_W + widen, dot_d, m)
                 bh = _lerp(bh, dot_d, m)
                 x = _lerp(bx, dot_x, m)
                 alpha = _lerp(1.0, 0.4 + 0.6 * pulse, m) * (1 - c)
             else:  # outer bars melt away
-                bw, x = BAR_W, bx
+                bw, x = BAR_W + widen, bx
                 alpha = (1 - m) ** 2
             if alpha <= 0.01:
                 continue
@@ -136,7 +141,7 @@ class _WaveView(NSView):
                 _lerp(0.80, 0.85, m), _lerp(0.82, 0.88, m), 1.0, alpha
             )
             path = NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(
-                ((x, y), (bw, bh)), bw / 2, bw / 2
+                ((x, y), (bw, bh)), min(bw, bh) / 2, min(bw, bh) / 2
             )
             NSGradient.alloc().initWithStartingColor_endingColor_(top, bottom).drawInBezierPath_angle_(path, 90)
         if c > 0.01:
