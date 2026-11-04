@@ -1,7 +1,7 @@
 """Floating frosted-glass pill shown while recording (like Wispr Flow).
 
 States: listening (bars follow your voice), quiet (nothing heard for a while:
-dimmed), thinking (shimmer while Whisper works). Must be created and driven
+dimmed), thinking (pill shrinks to three pulsing dots while Whisper works). Must be created and driven
 from the main thread (the menu bar app's timer, ~60 fps).
 """
 
@@ -44,6 +44,9 @@ FADE_IN, FADE_OUT = 0.14, 0.09  # alpha per frame (~60 fps)
 OPEN_FRAMES = 22  # spring-open duration
 QUIET_LEVEL, QUIET_SECONDS = 0.12, 2.5  # envelope below this for this long = "quiet"
 QUIET_ALPHA = 0.55
+THINK_W, THINK_H = 54, 26  # the pill shrinks to this while Whisper works
+SHRINK = 0.22  # per-frame easing of the pill size
+DOT_R, DOT_GAP = 3.0, 9.0
 
 # bars in the middle react more than the edges, like a voice envelope
 _CENTER = (BARS - 1) / 2
@@ -62,6 +65,7 @@ class _WaveView(NSView):
         if self is not None:
             self.levels = [0.0] * BARS
             self.thinking = False
+            self.phase = 0.0
         return self
 
     def isFlipped(self):
@@ -69,12 +73,18 @@ class _WaveView(NSView):
 
     def drawRect_(self, rect):
         w, h = self.bounds().size.width, self.bounds().size.height
+        if self.thinking:  # three softly pulsing dots
+            x = w / 2 - DOT_GAP
+            for i in range(3):
+                a = 0.3 + 0.7 * (0.5 + 0.5 * math.sin(self.phase * 5.0 - i * 1.0))
+                r = DOT_R * (0.85 + 0.25 * a)
+                NSColor.colorWithCalibratedRed_green_blue_alpha_(0.85, 0.88, 1.0, a).setFill()
+                NSBezierPath.bezierPathWithOvalInRect_(((x - r, h / 2 - r), (2 * r, 2 * r))).fill()
+                x += DOT_GAP
+            return
         total = BARS * BAR_W + (BARS - 1) * GAP
         x = (w - total) / 2
-        if self.thinking:  # cool lavender while thinking
-            top, bottom = (0.80, 0.84, 1.0, 1.0), (0.62, 0.68, 1.0, 1.0)
-        else:  # white to soft lilac
-            top, bottom = (1.0, 1.0, 1.0, 1.0), (0.80, 0.82, 1.0, 1.0)
+        top, bottom = (1.0, 1.0, 1.0, 1.0), (0.80, 0.82, 1.0, 1.0)  # white to soft lilac
         grad = NSGradient.alloc().initWithStartingColor_endingColor_(
             NSColor.colorWithCalibratedRed_green_blue_alpha_(*top),
             NSColor.colorWithCalibratedRed_green_blue_alpha_(*bottom),
@@ -105,6 +115,7 @@ class Overlay:
         self.alpha = 0.0
         self.open_t = 0
         self.quiet_since = None
+        self.w, self.h = WIDTH, HEIGHT
 
     def _build(self):
         screen = NSScreen.mainScreen().frame()
@@ -161,6 +172,11 @@ class Overlay:
         except Exception:
             pass
 
+    def _set_size(self, w: float, h: float) -> None:
+        self.w, self.h = w, h
+        self.pill.setFrame_(((PAD + (WIDTH - w) / 2, PAD + (HEIGHT - h) / 2), (w, h)))
+        self.pill.layer().setCornerRadius_(h / 2)
+
     def update(self, recording: bool, level: float, thinking: bool = False) -> None:
         """Call from the main thread at ~60 fps."""
         active = recording or thinking
@@ -174,6 +190,7 @@ class Overlay:
             self.alpha = 0.0
             self.open_t = 0
             self.quiet_since = None
+            self._set_size(WIDTH, HEIGHT)
             self.panel.setAlphaValue_(0.0)
             self._set_scale(0.7)
             self.panel.orderFrontRegardless()
@@ -181,6 +198,10 @@ class Overlay:
 
         now = time.monotonic()
         self.view.thinking = thinking and not recording
+        self.view.phase = now
+        tw, th = (THINK_W, THINK_H) if self.view.thinking else (WIDTH, HEIGHT)
+        if abs(self.w - tw) > 0.3 or abs(self.h - th) > 0.3:
+            self._set_size(self.w + (tw - self.w) * SHRINK, self.h + (th - self.h) * SHRINK)
 
         # smooth loudness envelope (sqrt makes quiet speech visible)
         target = min(1.0, math.sqrt(level) * 2.4) if recording else 0.0
@@ -195,11 +216,8 @@ class Overlay:
 
         # each bar wobbles at its own pace so the motion looks organic
         for i in range(BARS):
-            if self.view.thinking:  # shimmer travelling across the bars
-                goal = 0.22 + 0.2 * math.sin(now * 6.0 - i * 0.65)
-            else:
-                wobble = 0.65 + 0.35 * math.sin(now * (5.0 + i * 0.9) + i * 1.7)
-                goal = self.env * PROFILE[i] * wobble
+            wobble = 0.65 + 0.35 * math.sin(now * (5.0 + i * 0.9) + i * 1.7)
+            goal = self.env * PROFILE[i] * wobble
             cur = self.view.levels[i]
             self.view.levels[i] = cur + (goal - cur) * BAR_SMOOTH
         self.view.setNeedsDisplay_(True)
