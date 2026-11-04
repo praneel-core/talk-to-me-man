@@ -25,6 +25,7 @@ last_paste: tuple[str, float] | None = None  # (text as pasted, time)
 frames: list[np.ndarray] = []
 stream: sd.InputStream | None = None
 recording = False
+done_count = 0  # bumps after every successful paste/edit (overlay shows a check mark)
 pending = 0  # recordings queued or being transcribed (drives the overlay's 'thinking' state)
 level = 0.0  # latest mic loudness (0..1-ish), read by the menu bar overlay
 lock = threading.Lock()
@@ -65,7 +66,7 @@ def transcribe_and_paste(audio: np.ndarray) -> None:
 
 
 def _transcribe_and_paste(audio: np.ndarray) -> None:
-    global last_paste
+    global last_paste, done_count
     if len(audio) / config.SAMPLE_RATE < config.MIN_SECONDS:
         return
     if not textproc.has_speech(audio, config.SAMPLE_RATE):
@@ -86,11 +87,13 @@ def _transcribe_and_paste(audio: np.ndarray) -> None:
         if edited is not None:
             replace_last(last_paste[0], edited)
             last_paste = (edited, time.time())
+            done_count += 1
             print(f"[{time.time() - t0:.2f}s] edit -> {edited!r}", flush=True)
             return
     text = llm_cleanup(text)
     paste(text)
     last_paste = (text + " ", time.time())
+    done_count += 1
     print(f"[{time.time() - t0:.2f}s] {text}", flush=True)
 
 
