@@ -12,7 +12,7 @@ PY="$REPO/venv/bin/python"
 mkdir -p "$HOME/Applications"
 rm -rf "$APP"
 
-osacompile -o "$APP" -e "do shell script \"cd '$REPO' && nohup '$PY' -m holdspeak.menubar > /tmp/dictate.log 2>&1 &\""
+osacompile -o "$APP" -e "do shell script \"cd '$REPO' && nohup '$PY' -m talktomeman.menubar > /tmp/dictate.log 2>&1 &\""
 "$PY" "$REPO/scripts/make_icon.py" "$APP/Contents/Resources/applet.icns"
 plutil -insert LSUIElement -bool true "$APP/Contents/Info.plist"
 codesign --force --deep --sign - "$APP"

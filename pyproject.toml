@@ -1,5 +1,5 @@
 [project]
-name = "holdspeak"
+name = "talktomeman"
 version = "0.1.0"
 description = "Free, local push-to-talk dictation for Apple Silicon Macs (Whisper + optional Ollama cleanup)"
 readme = "README.md"
@@ -18,7 +18,7 @@ dependencies = [
 dev = ["pytest"]
 
 [tool.setuptools]
-packages = ["holdspeak"]
+packages = ["talktomeman"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

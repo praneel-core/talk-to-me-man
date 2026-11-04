@@ -63,8 +63,8 @@ EDIT_WINDOW = 120  # seconds after a paste during which commands apply to it
 
 # --- custom vocabulary ---
 # Words Whisper often gets wrong. Add your own names/jargon, one per line, to
-# ~/.config/holdspeak/words.txt (kept out of the repo).
-USER_WORDS_FILE = Path.home() / ".config" / "holdspeak" / "words.txt"
+# ~/.config/talktomeman/words.txt (kept out of the repo).
+USER_WORDS_FILE = Path.home() / ".config" / "talktomeman" / "words.txt"
 DEFAULT_WORDS = [
     "ChatGPT", "Claude", "Anthropic", "OpenAI", "Gemini", "Ollama", "Whisper",
     "GitHub", "VS Code", "Notion", "Slack", "Jira", "Confluence", "Zoom",

@@ -1,6 +1,6 @@
 import pytest
 
-from holdspeak import textproc
+from talktomeman import textproc
 
 
 @pytest.mark.parametrize(

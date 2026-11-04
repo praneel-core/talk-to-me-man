@@ -1,4 +1,4 @@
-# Holdspeak
+# Talk To Me Man
 
 Free, unlimited, fully local push-to-talk dictation for Apple Silicon Macs.
 Hold **Right Option**, speak, release: the text is pasted into the focused app.
@@ -18,7 +18,7 @@ macOS on Apple Silicon, Python 3.10+, and (optional) Ollama with `qwen2.5:3b`.
 ## Install
 
 ```bash
-git clone https://github.com/praneel-core/holdspeak.git && cd holdspeak
+git clone https://github.com/praneel-core/talk-to-me-man.git && cd talk-to-me-man
 python3 -m venv venv
 venv/bin/pip install -r requirements.txt        # or: venv/bin/pip install -r requirements.lock
 
@@ -32,8 +32,8 @@ The first run downloads the Whisper model (~1.5 GB).
 ## Run
 
 ```bash
-venv/bin/python -m holdspeak            # terminal, Ctrl+C to quit
-venv/bin/python -m holdspeak.menubar    # menu bar app
+venv/bin/python -m talktomeman            # terminal, Ctrl+C to quit
+venv/bin/python -m talktomeman.menubar    # menu bar app
 scripts/build_app.sh                  # build ~/Applications/Dictate.app (launch from Spotlight)
 ```
 
@@ -48,14 +48,14 @@ Optional: add Dictate.app to Login Items. Ollama started via `brew services` alr
 
 ## Customise
 
-- Settings (hotkey, models, thresholds, cleanup prompt): [holdspeak/config.py](holdspeak/config.py)
-- Your own names and jargon for Whisper: one per line in `~/.config/holdspeak/words.txt`
+- Settings (hotkey, models, thresholds, cleanup prompt): [talktomeman/config.py](talktomeman/config.py)
+- Your own names and jargon for Whisper: one per line in `~/.config/talktomeman/words.txt`
 - Log of the menu bar app: `/tmp/dictate.log`
 
 ## Layout
 
 ```
-holdspeak/
+talktomeman/
   config.py     settings, prompts, vocabulary
   textproc.py   pure text logic (cleanup, punctuation commands, guards), unit-tested
   llm.py        Ollama call + safety checks
