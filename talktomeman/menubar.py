@@ -8,7 +8,7 @@ import math
 import threading
 
 import rumps
-from AppKit import NSColor
+from AppKit import NSColor, NSStatusBar, NSVariableStatusItemLength
 from pynput import keyboard
 
 from . import config, core, icons
@@ -39,7 +39,11 @@ class DictateApp(rumps.App):
         self.llm_item = rumps.MenuItem("Smart cleanup (Ollama)", callback=self.on_llm)
         self.llm_item.state = 1 if config.USE_LLM else 0
         self.ollama_item = rumps.MenuItem("Ollama: checking...", callback=lambda _: None)
-        self.menu = [self.status, self.ollama_item, None, self.toggle, self.llm_item, None]
+        self.dot_item = None  # separate coloured status item, created on the main thread
+        if config.OLLAMA_INDICATOR == "badge":
+            self.menu = [self.status, self.ollama_item, None, self.toggle, self.llm_item, None]
+        else:
+            self.menu = [self.status, None, self.toggle, self.llm_item, None]
 
         self.ollama.start()
         threading.Thread(target=self.load, daemon=True).start()
@@ -86,9 +90,39 @@ class DictateApp(rumps.App):
 
     def _badge(self) -> str | None:
         """Corner badge on the icon, only when Smart cleanup is on but not ready."""
+        if config.OLLAMA_INDICATOR != "badge":
+            return None
         return {"off": "dot", "starting": "ring"}.get(self._ollama_state())
 
+    def _update_dot(self) -> None:
+        """Traffic-light dot next to the icon: green ready, orange starting, red off."""
+        if config.OLLAMA_INDICATOR != "dot":
+            return
+        if self.dot_item is None:
+            self.dot_item = NSStatusBar.systemStatusBar().statusItemWithLength_(NSVariableStatusItemLength)
+        st = self._ollama_state()
+        button = self.dot_item.button()
+        if st != self.ollama_shown:
+            self.ollama_shown = st
+            if st == "disabled":
+                self.dot_item.setVisible_(False)
+                return
+            title, color = {
+                "ready": ("Ollama ready", NSColor.systemGreenColor()),
+                "starting": ("Ollama starting...", NSColor.systemOrangeColor()),
+                "off": ("Ollama not running (cleanup skipped)", NSColor.systemRedColor()),
+            }[st]
+            self.dot_item.setVisible_(True)
+            button.setImage_(icons.status_dot(color, size=7.0, glow=True))
+            button.setToolTip_(title)
+        if st == "starting":  # gentle pulse while the model loads
+            button.setAlphaValue_(0.55 + 0.45 * (0.5 + 0.5 * math.sin(self.frame / 8)))
+        else:
+            button.setAlphaValue_(1.0)
+
     def _update_ollama_item(self) -> None:
+        if config.OLLAMA_INDICATOR != "badge":
+            return
         st = self._ollama_state()
         if st == self.ollama_shown:
             return
@@ -123,6 +157,7 @@ class DictateApp(rumps.App):
             self.overlay.update(self._active(), core.level, core.pending > 0, core.done_count)
         state, badge = self._state(), self._badge()
         self._update_ollama_item()
+        self._update_dot()
         if (state, badge) != self.icon_state:
             self.icon_state = (state, badge)
             self._apply_icon(state, badge)

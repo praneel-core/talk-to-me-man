@@ -60,6 +60,9 @@ Output: No, I cannot make it tomorrow.
 
 # --- menu bar icon style: "option" (the ⌥ key), "bubble" or "waveform" ---
 MENU_ICON = "option"
+# Ollama status: "dot" = small coloured light next to the icon (green/orange/red),
+# "badge" = monochrome corner badge on the icon + a light inside the dropdown
+OLLAMA_INDICATOR = "dot"
 
 # --- spoken punctuation commands (say as a separate dictation) ---
 EDIT_WINDOW = 120  # seconds after a paste during which commands apply to it

@@ -60,13 +60,20 @@ def _badge(kind: str | None) -> None:
         path.stroke()
 
 
-def status_dot(color, size: float = 10.0):
-    """A small coloured, non-template dot (for menu items): a soft-edged circle
-    with a subtle highlight, so it looks like a physical indicator light."""
-    img = NSImage.alloc().initWithSize_((size, size))
+def status_dot(color, size: float = 10.0, glow: bool = False):
+    """A small coloured, non-template dot: a soft-edged circle with a subtle
+    highlight, so it looks like a physical indicator light. With `glow`, a faint
+    halo of the same colour surrounds it (menu bar version)."""
+    pad = 3.0 if glow else 0.0
+    total = size + 2 * pad
+    img = NSImage.alloc().initWithSize_((total, total))
     img.lockFocus()
-    r = size / 2 - 0.5
-    base = NSBezierPath.bezierPathWithOvalInRect_(((0.5, 0.5), (size - 1, size - 1)))
+    if glow:
+        for i, a in enumerate((0.10, 0.16, 0.22)):
+            g = pad - i
+            color.colorWithAlphaComponent_(a).setFill()
+            NSBezierPath.bezierPathWithOvalInRect_(((pad - g, pad - g), (size + 2 * g, size + 2 * g))).fill()
+    base = NSBezierPath.bezierPathWithOvalInRect_(((pad + 0.5, pad + 0.5), (size - 1, size - 1)))
     NSGradient.alloc().initWithStartingColor_endingColor_(
         color.blendedColorWithFraction_ofColor_(0.35, NSColor.whiteColor()),
         color.blendedColorWithFraction_ofColor_(0.25, NSColor.blackColor()),
