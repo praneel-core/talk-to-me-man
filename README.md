@@ -4,12 +4,18 @@ Free, unlimited, fully local push-to-talk dictation for Apple Silicon Macs.
 Hold **Right Option**, speak, release: the text is pasted into the focused app.
 No cloud, no subscription, nothing leaves your machine.
 
-- **Transcription:** [mlx-whisper](https://github.com/ml-explore/mlx-examples) (`whisper-large-v3-turbo`)
+![Demo: hold Right Option, speak, release: the text appears, with the self-correction resolved](docs/demo.gif)
+
+*Spoken: "Let's meet on Tuesday, no, Wednesday at three." Pasted: "Let's meet on Wednesday at 3."*
+
+- **Transcription:** [mlx-whisper](https://github.com/ml-explore/mlx-examples) (`whisper-large-v3-turbo`), fully on-device.
 - **Self-correction cleanup (optional):** a local [Ollama](https://ollama.com) model turns
   "Tuesday, no, Wednesday" into "Wednesday". It only runs when your sentence contains a correction cue.
+- **Live feedback:** a frosted-glass pill with a waveform while you speak, three pulsing dots while it
+  transcribes, and a check mark when the text is pasted. Start and stop sounds too.
 - **Spoken punctuation edits:** after dictating, say "comma", "full stop", "question mark", "quotes"... as a
   separate dictation to fix the previous text.
-- **Menu bar app** with pause and Smart-cleanup toggles, start/stop sounds.
+- **Menu bar app:** an Option-key (⌥) icon that turns bold while recording, plus pause and Smart-cleanup toggles.
 
 ## Requirements
 
