@@ -35,7 +35,28 @@ No cloud, no subscription, nothing leaves your machine.
 7. **Correction cue.** If the text contains a cue such as "no", "I mean" or a repeated phrase, a local Ollama model removes the mistaken part. It is told to change nothing else, and a safety check keeps your original text if it rewords too much. If Ollama is off, your text is kept as it is.
 8. **Paste.** The text goes in through the clipboard (Cmd+V), the clipboard is restored, a check mark appears and the text is added to Recent dictations.
 
-Edit the diagram with `python scripts/make_flow.py` (it rewrites `docs/flow.svg`).
+## Under the hood
+
+The same pipeline from a technical angle: what runs each stage and which library does the work.
+
+![Technical view: which library or API handles each stage of a dictation](docs/internals.svg)
+
+| Library / tool | Used for |
+|---|---|
+| [`pynput`](https://pynput.readthedocs.io) | global hotkey listener (macOS event tap) and the simulated Cmd+V and Shift+Left key presses |
+| [`sounddevice`](https://python-sounddevice.readthedocs.io) | microphone capture through PortAudio / CoreAudio, 16 kHz mono float32 |
+| [`numpy`](https://numpy.org) | audio buffers, loudness (RMS) for the speech check and the waveform |
+| [`mlx-whisper`](https://github.com/ml-explore/mlx-examples/tree/main/whisper) | speech to text with `whisper-large-v3-turbo`, running on the Apple GPU via MLX |
+| [Ollama](https://ollama.com) (`qwen2.5:3b`) | optional local model that fixes spoken self-corrections, called over `localhost` with `urllib` |
+| [`pyperclip`](https://github.com/asweigart/pyperclip) | clipboard access (`pbcopy` / `pbpaste`) for pasting |
+| [`rumps`](https://github.com/jaredks/rumps) | the menu bar app and its menu |
+| PyObjC (`AppKit`, `Quartz`) | the floating waveform pill, SF Symbol menu bar icons, the status dot, permission checks |
+| `afplay` | the start and stop sounds |
+| Python standard library | `threading` and `queue` (worker thread, locks), `re` (cleanup and cue detection), `collections.deque` (recent dictations), `json` (settings) |
+
+Threads: the key listener only queues events; a worker thread opens and closes the mic; each recording is transcribed on its own thread behind a lock (MLX is not thread-safe); a monitor thread watches Ollama; the UI runs on the main thread.
+
+Regenerate the diagrams with `python scripts/make_flow.py` and `python scripts/make_internals.py`.
 
 ## Requirements
 
@@ -94,7 +115,7 @@ talktomeman/
   icons.py          menu bar icons
   menubar.py        rumps menu bar app
   settings.py       saves menu choices (microphone, Smart cleanup) to ~/.config/talktomeman/settings.json
-scripts/            build_app.sh, make_icon.py, make_flow.py (regenerates docs/flow.svg)
+scripts/            build_app.sh, make_icon.py, make_flow.py and make_internals.py (regenerate the diagrams in docs/)
 tests/              pytest suite for textproc
 dictate_menubar.py  legacy launcher path for an already-built Dictate.app; safe to delete after rebuilding it
 ```
