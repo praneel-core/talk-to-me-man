@@ -25,6 +25,7 @@ last_paste: tuple[str, float] | None = None  # (text as pasted, time)
 frames: list[np.ndarray] = []
 stream: sd.InputStream | None = None
 recording = False
+level = 0.0  # latest mic loudness (0..1-ish), read by the menu bar overlay
 lock = threading.Lock()
 transcribe_lock = threading.Lock()  # MLX isn't safe to run from two threads at once
 _events: queue.SimpleQueue = queue.SimpleQueue()
@@ -107,7 +108,9 @@ def _watchdog() -> None:
 
 
 def on_audio(indata, frame_count, time_info, status):
+    global level
     frames.append(indata.copy())
+    level = float(np.sqrt(np.mean(indata**2)))
 
 
 def _do_press():
@@ -136,11 +139,12 @@ def _do_press():
 
 
 def _do_release():
-    global stream, recording
+    global stream, recording, level
     with lock:
         if not recording:
             return
         recording = False
+        level = 0.0
         try:
             stream.stop()
             stream.close()
