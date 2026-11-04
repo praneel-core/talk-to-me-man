@@ -44,3 +44,19 @@ def test_too_different_flags_rewording():
 def test_prompt_echo_detected():
     assert textproc.is_prompt_echo("ChatGPT, Claude, Anthropic.")
     assert not textproc.is_prompt_echo("Ask Claude about the API.")
+
+
+def test_has_speech_rejects_silence_and_noise():
+    import numpy as np
+
+    rng = np.random.default_rng(0)
+    assert not textproc.has_speech(np.zeros(32000, dtype=np.float32), 16000)
+    assert not textproc.has_speech(rng.normal(0, 0.004, 32000).astype(np.float32), 16000)
+
+
+def test_has_speech_accepts_loud_audio():
+    import numpy as np
+
+    t = np.arange(32000) / 16000
+    tone = (0.1 * np.sin(2 * np.pi * 220 * t)).astype(np.float32)
+    assert textproc.has_speech(tone, 16000)

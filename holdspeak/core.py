@@ -63,14 +63,15 @@ def _transcribe_and_paste(audio: np.ndarray) -> None:
     global last_paste
     if len(audio) / config.SAMPLE_RATE < config.MIN_SECONDS:
         return
-    if float(np.sqrt(np.mean(audio**2))) < config.MIN_LOUDNESS:
-        return  # silence: don't let Whisper invent text
+    if not textproc.has_speech(audio, config.SAMPLE_RATE):
+        return  # silence/noise: don't let Whisper invent text
     t0 = time.time()
     result = mlx_whisper.transcribe(
         audio,
         path_or_hf_repo=config.MODEL,
         initial_prompt=config.WHISPER_PROMPT,
         condition_on_previous_text=False,
+        no_speech_threshold=0.5,
     )
     text = textproc.clean(result.get("text", ""))
     if not text or textproc.is_prompt_echo(text):

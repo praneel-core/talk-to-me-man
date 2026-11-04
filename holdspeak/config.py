@@ -9,7 +9,9 @@ HOTKEY = keyboard.Key.alt_r  # hold to talk (right Option)
 SAMPLE_RATE = 16000
 MIN_SECONDS = 0.4  # ignore accidental taps
 MAX_SECONDS = 120  # hard cap on one recording
-MIN_LOUDNESS = 0.01  # RMS below this counts as silence (Whisper hallucinates on it)
+CUE_SKIP_SECONDS = 0.3  # ignore this much audio at the start (our own start sound)
+SPEECH_FRAME_RMS = 0.015  # a 30 ms frame louder than this counts as speech-like
+MIN_SPEECH_FRAMES = 6  # need ~0.2 s of speech-like frames to transcribe
 
 # --- transcription ---
 MODEL = "mlx-community/whisper-large-v3-turbo"  # accurate + fast on M-series
