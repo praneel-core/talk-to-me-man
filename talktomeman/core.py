@@ -25,6 +25,7 @@ last_paste: tuple[str, float] | None = None  # (text as pasted, time)
 frames: list[np.ndarray] = []
 stream: sd.InputStream | None = None
 recording = False
+pressing = False  # hotkey physically down; flips instantly, before the mic has opened
 done_count = 0  # bumps after every successful paste/edit (overlay shows a check mark)
 pending = 0  # recordings queued or being transcribed (drives the overlay's 'thinking' state)
 level = 0.0  # latest mic loudness (0..1-ish), read by the menu bar overlay
@@ -123,7 +124,7 @@ def on_audio(indata, frame_count, time_info, status):
 
 
 def _do_press():
-    global stream, recording
+    global stream, recording, pressing
     with lock:
         if recording:
             return
@@ -140,6 +141,7 @@ def _do_press():
             # e.g. mic permission denied; don't leave `recording` stuck on
             print(f"(could not start recording: {e})", flush=True)
             stream = None
+            pressing = False  # don't leave the UI stuck in "recording"
             return
         recording = True
         play_sound("Pop")
@@ -148,11 +150,12 @@ def _do_press():
 
 
 def _do_release():
-    global stream, recording, level, pending
+    global stream, recording, level, pending, pressing
     with lock:
         if not recording:
             return
         recording = False
+        pressing = False
         level = 0.0
         try:
             stream.stop()
@@ -178,12 +181,16 @@ def _worker() -> None:
 
 
 def on_press(key):
+    global pressing
     if key == config.HOTKEY:
+        pressing = True
         _events.put("press")
 
 
 def on_release(key):
+    global pressing
     if key == config.HOTKEY:
+        pressing = False
         _events.put("release")
 
 
