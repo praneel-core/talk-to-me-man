@@ -24,22 +24,11 @@ No cloud, no subscription, nothing leaves your machine.
 
 ## How it works
 
-![Flow of a dictation, from holding the key to the pasted text](docs/flow.svg)
+What happens between pressing the key and seeing your text, in plain English, with the technology behind each step on the right.
 
-1. **Hold Right Option.** The mic opens, a start sound plays and the waveform pill appears. The key listener only queues the event; a worker thread does the slow work, so the hotkey never freezes.
-2. **Release.** The mic closes and the audio stays in memory. It is never written to disk or sent anywhere.
-3. **Speech check.** A quick loudness check drops silence and noise, because Whisper invents text for them.
-4. **Whisper** (`mlx-whisper`, on-device) turns the audio into text. A short prompt with your word list helps it spell names and jargon.
-5. **Quick cleanup** removes "um" and "uh" and tidies spacing.
-6. **Spoken punctuation.** If the whole dictation is a command like "comma" or "quotes" and you dictated within the last 2 minutes, the previous text is re-pasted with that fix and nothing else happens.
-7. **Correction cue.** If the text contains a cue such as "no", "I mean" or a repeated phrase, a local Ollama model removes the mistaken part. It is told to change nothing else, and a safety check keeps your original text if it rewords too much. If Ollama is off, your text is kept as it is.
-8. **Paste.** The text goes in through the clipboard (Cmd+V), the clipboard is restored, a check mark appears and the text is added to Recent dictations.
+![What happens when you dictate, step by step, with the technology behind each step](docs/how-it-works.svg)
 
-## Under the hood
-
-The same pipeline from a technical angle: what runs each stage and which library does the work.
-
-![Technical view: which library or API handles each stage of a dictation](docs/internals.svg)
+### Libraries used
 
 | Library / tool | Used for |
 |---|---|
@@ -54,9 +43,9 @@ The same pipeline from a technical angle: what runs each stage and which library
 | `afplay` | the start and stop sounds |
 | Python standard library | `threading` and `queue` (worker thread, locks), `re` (cleanup and cue detection), `collections.deque` (recent dictations), `json` (settings) |
 
-Threads: the key listener only queues events; a worker thread opens and closes the mic; each recording is transcribed on its own thread behind a lock (MLX is not thread-safe); a monitor thread watches Ollama; the UI runs on the main thread.
+**Threads:** the key listener only queues events; a worker thread opens and closes the mic; each recording is transcribed on its own thread behind a lock (MLX is not thread-safe); a monitor thread watches Ollama; the UI runs on the main thread.
 
-Regenerate the diagrams with `python scripts/make_flow.py` and `python scripts/make_internals.py`.
+Regenerate the diagram with `python scripts/make_diagram.py` (it rewrites `docs/how-it-works.svg`).
 
 ## Requirements
 
@@ -115,7 +104,7 @@ talktomeman/
   icons.py          menu bar icons
   menubar.py        rumps menu bar app
   settings.py       saves menu choices (microphone, Smart cleanup) to ~/.config/talktomeman/settings.json
-scripts/            build_app.sh, make_icon.py, make_flow.py and make_internals.py (regenerate the diagrams in docs/)
+scripts/            build_app.sh, make_icon.py, make_diagram.py (regenerates docs/how-it-works.svg)
 tests/              pytest suite for textproc
 dictate_menubar.py  legacy launcher path for an already-built Dictate.app; safe to delete after rebuilding it
 ```
