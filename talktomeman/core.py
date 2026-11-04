@@ -18,7 +18,7 @@ import sounddevice as sd
 from pynput import keyboard
 
 from . import config, textproc
-from .llm import llm_cleanup
+from .llm import llm_cleanup, warm_up_model
 
 kb = keyboard.Controller()
 last_paste: tuple[str, float] | None = None  # (text as pasted, time)
@@ -197,13 +197,13 @@ def on_release(key):
 threading.Thread(target=_worker, daemon=True).start()
 
 
-def warm_up() -> None:
+def warm_up(llm: bool = True) -> None:
     """Load the models so the first real dictation isn't slow."""
     mlx_whisper.transcribe(
         np.zeros(config.SAMPLE_RATE, dtype=np.float32), path_or_hf_repo=config.MODEL
     )
-    if config.USE_LLM:
-        llm_cleanup("can we meet on tuesday no wednesday")  # has a cue, so it really loads the model
+    if llm and config.USE_LLM:
+        warm_up_model()
 
 
 def main():
