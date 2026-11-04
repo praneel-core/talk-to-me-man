@@ -12,6 +12,9 @@ No cloud, no subscription, nothing leaves your machine.
 - **Spoken punctuation edits:** after dictating, say "comma", "full stop", "question mark", "quotes"... as a
   separate dictation to fix the previous text.
 - **Menu bar app:** an Option-key (⌥) icon that turns bold while recording, plus pause and Smart-cleanup toggles.
+- **Ollama status light:** a small dot on the icon's top-right corner: green = Ollama ready, orange (pulsing) =
+  starting, red = not running (self-correction cleanup is skipped). Hover it for a tooltip. The app loads the
+  model for you as soon as Ollama comes up.
 
 ## Requirements
 
@@ -51,6 +54,8 @@ Optional: add Dictate.app to Login Items. Ollama started via `brew services` alr
 ## Customise
 
 - Settings (hotkey, models, thresholds, cleanup prompt): [talktomeman/config.py](talktomeman/config.py)
+- Menu bar look: `MENU_ICON` (`"option"`, `"bubble"` or `"waveform"`) and `OLLAMA_INDICATOR`
+  (`"dot"` for the coloured light, `"badge"` for a monochrome corner badge plus a line in the menu)
 - Your own names and jargon for Whisper: one per line in `~/.config/talktomeman/words.txt`
 - Log of the menu bar app: `/tmp/dictate.log`
 
@@ -58,13 +63,17 @@ Optional: add Dictate.app to Login Items. Ollama started via `brew services` alr
 
 ```
 talktomeman/
-  config.py     settings, prompts, vocabulary
-  textproc.py   pure text logic (cleanup, punctuation commands, guards), unit-tested
-  llm.py        Ollama call + safety checks
-  core.py       hotkey, mic, transcription, paste
-  menubar.py    rumps menu bar wrapper
-scripts/        build_app.sh, make_icon.py
-tests/          pytest suite for textproc
+  config.py         settings, prompts, vocabulary
+  textproc.py       pure text logic (cleanup, punctuation commands, speech check), unit-tested
+  llm.py            Ollama call + safety checks
+  ollama_status.py  watches Ollama (off / starting / ready) and loads the model when it comes up
+  core.py           hotkey, mic, transcription, paste
+  overlay.py        floating waveform pill (listening, thinking, done)
+  icons.py          menu bar icons
+  menubar.py        rumps menu bar app
+scripts/            build_app.sh, make_icon.py
+tests/              pytest suite for textproc
+dictate_menubar.py  legacy launcher path for an already-built Dictate.app; safe to delete after rebuilding it
 ```
 
 ## Develop
@@ -77,6 +86,7 @@ venv/bin/pip install pytest && venv/bin/python -m pytest
 
 - Punctuation commands edit the last pasted text by selecting it with Shift+Left, so they only work while
   the cursor is still right after that text (and within 2 minutes).
+- The Ollama status dot has so far only been checked on a dark menu bar.
 - Whisper large-v3-turbo takes ~1.5-2 s per short dictation; `whisper-small-mlx` is faster but less accurate.
 
 ## License
