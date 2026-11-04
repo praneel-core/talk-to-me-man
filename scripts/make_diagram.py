@@ -1,4 +1,5 @@
-"""Generate docs/how-it-works.svg for the README.
+"""Generate docs/how-it-works.svg for the README (light theme only: it carries its own
+background panel, so it looks the same on GitHub's light and dark themes).
 Run from the repo root: python scripts/make_diagram.py"""
 
 W = 940
@@ -77,6 +78,7 @@ y = 24
 # headline pill
 out.append(f'<rect class="pill" x="{CARD_X}" y="{y}" width="446" height="30" rx="15"/>')
 out.append(f'<text class="pilltxt" x="{CARD_X + 223}" y="{y + 20}" text-anchor="middle">Everything stays on your Mac: audio and text never leave it</text>')
+out.append(f'<text class="legend" x="{CARD_X + CARD_W}" y="{y + 19}" text-anchor="end">YOU: your action   \u00b7   AUTOMATIC: the app does it   \u00b7   ONLY IF: special cases</text>')
 y += 58
 # column headers
 for x, t in ((LEFT_X, "WHAT YOU DO"), (MID_X, "WHAT THE APP DOES"), (CHIP_X, "WHAT RUNS IT")):
@@ -93,29 +95,30 @@ for phase, rows in PHASES:
         sub = wrap(r["sub"], LEFT_W, 6.6)
         mid = wrap(r["mid"], MID_W, 6.8)
         chips = chip_layout(r["chips"])
-        left_h = 18 + 20 * len(title) + 16 * len(sub)
+        left_h = 14 + 20 * len(title) + 16 * len(sub)
         mid_h = 20 * len(mid)
-        chip_h = 28 * len(chips)
-        h = max(86, 24 + max(left_h, mid_h, chip_h) + 14)
+        chip_h = 28 * len(chips) - 6
+        h = max(88, max(left_h, mid_h, chip_h) + 46)
         out.append(f'<rect class="card" x="{CARD_X}" y="{y}" width="{CARD_W}" height="{h}" rx="16"/>')
         cy = y + h / 2
-        nodes.append((NODE_X - 2, cy))
-        out.append(f'<circle class="node" cx="{NODE_X - 14}" cy="{y + 36}" r="13"/>')
-        out.append(f'<text class="nodetxt" x="{NODE_X - 14}" y="{y + 40.5}" text-anchor="middle">{n}</text>')
-        # left column
-        ty = y + 26
+        nodes.append((NODE_X - 14, cy))
+        out.append(f'<circle class="node" cx="{NODE_X - 14}" cy="{cy}" r="13"/>')
+        out.append(f'<text class="nodetxt" x="{NODE_X - 14}" y="{cy + 4.5}" text-anchor="middle">{n}</text>')
+        # left column (vertically centred)
+        ty = y + (h - left_h) / 2 + 10
         out.append(f'<text class="tag tag-{r["tag"].replace(" ", "")}" x="{LEFT_X}" y="{ty}">{r["tag"]}</text>')
-        ty += 20
+        ty += 22
         for l in title:
             out.append(f'<text class="title" x="{LEFT_X}" y="{ty}">{esc(l)}</text>'); ty += 20
+        ty -= 4
         for l in sub:
-            out.append(f'<text class="sub" x="{LEFT_X}" y="{ty - 2}">{esc(l)}</text>'); ty += 16
-        # middle
-        ty = y + 33
+            out.append(f'<text class="sub" x="{LEFT_X}" y="{ty}">{esc(l)}</text>'); ty += 16
+        # middle (vertically centred)
+        ty = y + (h - mid_h) / 2 + 14
         for l in mid:
             out.append(f'<text class="mid" x="{MID_X}" y="{ty}">{esc(l)}</text>'); ty += 20
-        # chips
-        cyy = y + 22
+        # chips (vertically centred)
+        cyy = y + (h - chip_h) / 2
         for row in chips:
             for c, x0, w in row:
                 out.append(f'<rect class="chip" x="{CHIP_X + x0}" y="{cyy}" width="{w}" height="22" rx="11"/>')
@@ -134,17 +137,17 @@ out.append(f'<text class="mid" x="{CARD_X + 24}" y="{y + 44}">Watches whether Ol
 H = y + 58 + 24
 # timeline line behind cards (drawn first)
 first, last = nodes[0], nodes[-1]
-timeline = f'<path class="line" d="M{NODE_X - 14},{nodes[0][1] - 20} L{NODE_X - 14},{nodes[-1][1] + 20}"/>'
+timeline = f'<path class="line" d="M{NODE_X - 14},{nodes[0][1]} L{NODE_X - 14},{nodes[-1][1]}"/>'
 
 css = """
 :root{--bg:#f9fafb;--card:#ffffff;--border:#e4e7ec;--text:#101828;--sub:#667085;--chip:#f2f4f7;--chiptxt:#344054;--accent:#6d5efc;--accentsoft:#ece9ff;--shadow:rgba(16,24,40,.07)}
-@media (prefers-color-scheme:dark){:root{--bg:#0d0f13;--card:#15171c;--border:#2a2e37;--text:#f2f4f7;--sub:#98a2b3;--chip:#20242c;--chiptxt:#d0d5dd;--accent:#8f85ff;--accentsoft:#241f4a;--shadow:rgba(0,0,0,.35)}}
 text{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Inter,Helvetica,Arial,sans-serif}
 .card{fill:var(--card);stroke:var(--border);stroke-width:1;filter:url(#sh)}
 .band{fill:var(--card);stroke:var(--border);stroke-width:1.2;stroke-dasharray:6 5}
 .panel{fill:var(--bg);stroke:var(--border);stroke-width:1}
 .pill{fill:var(--accentsoft)}
 .pilltxt{font-size:12.5px;font-weight:600;fill:var(--accent)}
+.legend{font-size:11.5px;fill:var(--sub)}
 .hd{font-size:10.5px;font-weight:700;letter-spacing:1.6px;fill:var(--sub)}
 .phase{font-size:11px;font-weight:800;letter-spacing:2px;fill:var(--accent)}
 .rule{stroke:var(--border);stroke-width:1}
