@@ -49,7 +49,7 @@ class DictateApp(rumps.App):
         )
         self.listener.start()
 
-    @rumps.timer(0.05)
+    @rumps.timer(1 / 60)
     def refresh_ui(self, _):
         """Update icon and waveform overlay on the main thread, from the real recording state."""
         if not self.ready:
