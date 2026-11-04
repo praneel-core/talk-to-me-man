@@ -8,12 +8,27 @@ import math
 import threading
 
 import rumps
-from AppKit import NSColor, NSStatusBar, NSVariableStatusItemLength
+import objc
+from AppKit import NSColor, NSView
+from Quartz import CGColorCreateGenericRGB
 from pynput import keyboard
 
 from . import config, core, icons
 from .ollama_status import OllamaMonitor
 from .overlay import Overlay
+
+
+class _DotView(NSView):
+    """The coloured status dot; lets clicks fall through to the menu bar button."""
+
+    def hitTest_(self, point):
+        return None
+
+
+def _cg(color):
+    c = color.colorUsingColorSpaceName_("NSCalibratedRGBColorSpace")
+    return CGColorCreateGenericRGB(c.redComponent(), c.greenComponent(), c.blueComponent(), 1.0)
+
 
 # emoji titles are only a fallback if SF Symbols aren't available
 IDLE, BUSY, REC, OFF = "🎙", "⏳", "🔴", "⏸"
@@ -39,7 +54,7 @@ class DictateApp(rumps.App):
         self.llm_item = rumps.MenuItem("Smart cleanup (Ollama)", callback=self.on_llm)
         self.llm_item.state = 1 if config.USE_LLM else 0
         self.ollama_item = rumps.MenuItem("Ollama: checking...", callback=lambda _: None)
-        self.dot_item = None  # separate coloured status item, created on the main thread
+        self.dot_view = None  # coloured dot laid over the menu bar icon (main thread only)
         if config.OLLAMA_INDICATOR == "badge":
             self.menu = [self.status, self.ollama_item, None, self.toggle, self.llm_item, None]
         else:
@@ -89,36 +104,59 @@ class DictateApp(rumps.App):
         return self.ollama.state if config.USE_LLM else "disabled"
 
     def _badge(self) -> str | None:
-        """Corner badge on the icon, only when Smart cleanup is on but not ready."""
-        if config.OLLAMA_INDICATOR != "badge":
-            return None
+        """What the icon image reserves/draws in its top-right corner."""
+        if config.OLLAMA_INDICATOR == "dot":
+            return "space"  # room for the coloured dot view laid over the icon
         return {"off": "dot", "starting": "ring"}.get(self._ollama_state())
 
     def _update_dot(self) -> None:
-        """Traffic-light dot next to the icon: green ready, orange starting, red off."""
+        """Coloured dot on the icon's top-right corner: green ready, orange
+        starting (pulsing), red not running. A subview of the status button, so
+        the glyph underneath stays a template image that follows light/dark mode."""
         if config.OLLAMA_INDICATOR != "dot":
             return
-        if self.dot_item is None:
-            self.dot_item = NSStatusBar.systemStatusBar().statusItemWithLength_(NSVariableStatusItemLength)
+        button = self._button()
+        if button is None:
+            return
+        if self.dot_view is None:
+            d = 6.0
+            v = _DotView.alloc().initWithFrame_(((0, 0), (d, d)))
+            v.setWantsLayer_(True)
+            layer = v.layer()
+            layer.setCornerRadius_(d / 2)
+            layer.setBorderWidth_(0.5)
+            layer.setBorderColor_(CGColorCreateGenericRGB(0, 0, 0, 0.35))
+            layer.setShadowOffset_((0, 0))
+            layer.setShadowRadius_(3.0)
+            layer.setShadowOpacity_(0.9)
+            layer.setMasksToBounds_(False)
+            button.addSubview_(v)
+            self.dot_view = v
         st = self._ollama_state()
-        button = self.dot_item.button()
+        v = self.dot_view
         if st != self.ollama_shown:
             self.ollama_shown = st
             if st == "disabled":
-                self.dot_item.setVisible_(False)
-                return
-            title, color = {
-                "ready": ("Ollama ready", NSColor.systemGreenColor()),
-                "starting": ("Ollama starting...", NSColor.systemOrangeColor()),
-                "off": ("Ollama not running (cleanup skipped)", NSColor.systemRedColor()),
-            }[st]
-            self.dot_item.setVisible_(True)
-            button.setImage_(icons.status_dot(color, size=7.0, glow=True))
-            button.setToolTip_(title)
-        if st == "starting":  # gentle pulse while the model loads
-            button.setAlphaValue_(0.55 + 0.45 * (0.5 + 0.5 * math.sin(self.frame / 8)))
-        else:
-            button.setAlphaValue_(1.0)
+                v.setHidden_(True)
+                button.setToolTip_("Smart cleanup off")
+            else:
+                title, color = {
+                    "ready": ("Ollama ready", NSColor.systemGreenColor()),
+                    "starting": ("Ollama starting...", NSColor.systemOrangeColor()),
+                    "off": ("Ollama not running (cleanup skipped)", NSColor.systemRedColor()),
+                }[st]
+                v.setHidden_(False)
+                v.layer().setBackgroundColor_(_cg(color))
+                v.layer().setShadowColor_(_cg(color))
+                button.setToolTip_(title)
+        # keep it on the icon's corner (the image is centred in the button)
+        b = button.bounds().size
+        cx = (b.width - icons.CANVAS_W) / 2 + icons.BADGE_CENTER[0]
+        cy = (b.height - icons.CANVAS) / 2 + icons.BADGE_CENTER[1]
+        if button.isFlipped():  # y grows downwards in a flipped view
+            cy = b.height - cy
+        v.setFrameOrigin_((cx - 3.0, cy - 3.0))
+        v.setAlphaValue_(0.5 + 0.5 * (0.5 + 0.5 * math.sin(self.frame / 8)) if st == "starting" else 1.0)
 
     def _update_ollama_item(self) -> None:
         if config.OLLAMA_INDICATOR != "badge":

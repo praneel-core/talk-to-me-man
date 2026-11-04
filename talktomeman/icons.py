@@ -32,6 +32,10 @@ CANVAS = 18.0  # canvas height
 CANVAS_W = 23.0  # every state is drawn on the same canvas so the item never changes size; the extra width leaves room for the badge
 
 
+# where the corner badge / coloured dot is centred, in image coordinates
+BADGE_CENTER = (CANVAS_W - 3.0, CANVAS - 2.8)
+
+
 def _glyph_rect(sym, badge: bool = False):
     """Where to draw `sym`: centred, or pushed to the left to make room for the badge."""
     w, h = sym.size().width, sym.size().height
@@ -43,7 +47,7 @@ def _badge(kind: str | None) -> None:
     """Small status badge in the top-right corner, drawn into the current image.
     A transparent ring is cut out around it (like a notification badge) so it
     stays crisp against the glyph. 'dot' = solid, 'ring' = hollow."""
-    if not kind:
+    if not kind or kind == "space":
         return
     cx, cy = CANVAS_W - 3.0, CANVAS - 2.8
     NSGraphicsContext.currentContext().setCompositingOperation_(NSCompositingOperationDestinationOut)
