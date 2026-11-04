@@ -58,6 +58,9 @@ Input: no I cannot make it tomorrow
 Output: No, I cannot make it tomorrow.
 """
 
+# --- menu bar icon style: "option" (the ⌥ key), "bubble" or "waveform" ---
+MENU_ICON = "option"
+
 # --- spoken punctuation commands (say as a separate dictation) ---
 EDIT_WINDOW = 120  # seconds after a paste during which commands apply to it
 

@@ -15,7 +15,6 @@ from .overlay import Overlay
 
 # emoji titles are only a fallback if SF Symbols aren't available
 IDLE, BUSY, REC, OFF = "🎙", "⏳", "🔴", "⏸"
-SYMBOLS = {"loading": "mic", "idle": "mic", "rec": "mic.fill", "off": "mic.slash", "error": "exclamationmark.triangle"}
 FALLBACK = {"loading": BUSY, "idle": IDLE, "rec": REC, "off": OFF, "error": "⚠️"}
 
 
@@ -79,7 +78,7 @@ class DictateApp(rumps.App):
     def _apply_icon(self, state: str) -> None:
         """Set the menu bar icon; falls back to an emoji title without SF Symbols."""
         button = self._button()
-        img = icons.symbol(SYMBOLS[state]) if state in SYMBOLS else None
+        img = icons.image_for(config.MENU_ICON, state)
         if button is not None and img is not None:
             button.setImage_(img)
             self.title = ""
@@ -97,8 +96,12 @@ class DictateApp(rumps.App):
             self.icon_state = state
             self._apply_icon(state)
         button = self._button()
-        if button is not None:  # gentle pulse while the models load
-            button.setAlphaValue_(0.45 + 0.35 * (0.5 + 0.5 * math.sin(self.frame / 9)) if state == "loading" else 1.0)
+        if button is not None:  # gentle pulse while loading, dimmed when paused
+            if state == "loading":
+                alpha = 0.45 + 0.35 * (0.5 + 0.5 * math.sin(self.frame / 9))
+            else:
+                alpha = 0.4 if state == "off" else 1.0
+            button.setAlphaValue_(alpha)
 
     @rumps.timer(5)
     def check_listener(self, _):
