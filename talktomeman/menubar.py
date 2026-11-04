@@ -15,7 +15,7 @@ from .overlay import Overlay
 
 # emoji titles are only a fallback if SF Symbols aren't available
 IDLE, BUSY, REC, OFF = "🎙", "⏳", "🔴", "⏸"
-SYMBOLS = {"loading": "mic", "idle": "mic", "off": "mic.slash", "error": "exclamationmark.triangle"}
+SYMBOLS = {"loading": "mic", "idle": "mic", "rec": "mic.fill", "off": "mic.slash", "error": "exclamationmark.triangle"}
 FALLBACK = {"loading": BUSY, "idle": IDLE, "rec": REC, "off": OFF, "error": "⚠️"}
 
 
@@ -62,6 +62,11 @@ class DictateApp(rumps.App):
         except Exception:
             return None
 
+    @staticmethod
+    def _active() -> bool:
+        # `pressing` flips the instant the key goes down, before the mic has opened
+        return core.recording or core.pressing
+
     def _state(self) -> str:
         if self.failed:
             return "error"
@@ -69,16 +74,12 @@ class DictateApp(rumps.App):
             return "loading"
         if not self.enabled:
             return "off"
-        return "rec" if core.recording else "idle"
+        return "rec" if self._active() else "idle"
 
     def _apply_icon(self, state: str) -> None:
         """Set the menu bar icon; falls back to an emoji title without SF Symbols."""
         button = self._button()
         img = icons.symbol(SYMBOLS[state]) if state in SYMBOLS else None
-        if state == "rec":
-            levels = self.overlay.view.levels if self.overlay.view else [0.0] * icons.WAVE_BARS
-            step = max(1, len(levels) // icons.WAVE_BARS)
-            img = icons.waveform(levels[1::step])
         if button is not None and img is not None:
             button.setImage_(img)
             self.title = ""
@@ -90,9 +91,9 @@ class DictateApp(rumps.App):
         """Update icon and waveform overlay on the main thread, from the real state."""
         self.frame += 1
         if self.ready:
-            self.overlay.update(core.recording, core.level, core.pending > 0, core.done_count)
+            self.overlay.update(self._active(), core.level, core.pending > 0, core.done_count)
         state = self._state()
-        if state != self.icon_state or (state == "rec" and self.frame % 3 == 0):
+        if state != self.icon_state:
             self.icon_state = state
             self._apply_icon(state)
         button = self._button()
