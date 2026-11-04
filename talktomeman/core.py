@@ -25,6 +25,7 @@ last_paste: tuple[str, float] | None = None  # (text as pasted, time)
 frames: list[np.ndarray] = []
 stream: sd.InputStream | None = None
 recording = False
+pending = 0  # recordings queued or being transcribed (drives the overlay's 'thinking' state)
 level = 0.0  # latest mic loudness (0..1-ish), read by the menu bar overlay
 lock = threading.Lock()
 transcribe_lock = threading.Lock()  # MLX isn't safe to run from two threads at once
@@ -55,8 +56,12 @@ def paste(text: str, trailing_space: bool = True) -> None:
 
 
 def transcribe_and_paste(audio: np.ndarray) -> None:
-    with transcribe_lock:
-        _transcribe_and_paste(audio)
+    global pending
+    try:
+        with transcribe_lock:
+            _transcribe_and_paste(audio)
+    finally:
+        pending -= 1
 
 
 def _transcribe_and_paste(audio: np.ndarray) -> None:
@@ -140,7 +145,7 @@ def _do_press():
 
 
 def _do_release():
-    global stream, recording, level
+    global stream, recording, level, pending
     with lock:
         if not recording:
             return
@@ -156,6 +161,7 @@ def _do_release():
         if not frames:
             return
         audio = np.concatenate(frames).flatten()
+    pending += 1
     threading.Thread(target=transcribe_and_paste, args=(audio,), daemon=True).start()
 
 
