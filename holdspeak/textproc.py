@@ -2,6 +2,8 @@
 
 import re
 
+import numpy as np
+
 from . import config
 
 FILLERS = re.compile(r"\b(?:um+|uh+|er+|ah+|hmm+|mm+)\b[,.]?\s*", re.IGNORECASE)
@@ -71,3 +73,17 @@ def apply_command(prev: str, spoken: str) -> str | None:
     if cmd in QUOTE_COMMANDS:
         return f'"{body}{tail}" '
     return body + PUNCT_COMMANDS[cmd] + " "
+
+
+def has_speech(audio: np.ndarray, sample_rate: int) -> bool:
+    """Cheap voice-activity check. Whisper invents text ("Thank you.") for
+    silence/noise, so only transcribe audio with enough loud 30 ms frames.
+    The first 0.3 s is ignored because the start sound plays into the mic."""
+    skip = int(config.CUE_SKIP_SECONDS * sample_rate)
+    audio = audio[skip:]
+    n = int(0.03 * sample_rate)
+    if len(audio) < n:
+        return False
+    frames = audio[: len(audio) // n * n].reshape(-1, n)
+    rms = np.sqrt((frames**2).mean(axis=1))
+    return int((rms > config.SPEECH_FRAME_RMS).sum()) >= config.MIN_SPEECH_FRAMES

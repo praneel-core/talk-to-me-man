@@ -10,6 +10,7 @@ import rumps
 from pynput import keyboard
 
 from . import config, core
+from .overlay import Overlay
 
 IDLE, BUSY, REC, OFF = "🎙", "⏳", "🔴", "⏸"
 
@@ -20,6 +21,7 @@ class DictateApp(rumps.App):
         self.enabled = True
         self.listener = None
         self.ready = False
+        self.overlay = Overlay()
 
         self.status = rumps.MenuItem("Loading models...")
         self.toggle = rumps.MenuItem("Enabled", callback=self.on_toggle)
@@ -47,11 +49,12 @@ class DictateApp(rumps.App):
         )
         self.listener.start()
 
-    @rumps.timer(0.2)
-    def refresh_title(self, _):
-        """Update the icon on the main thread, from the real recording state."""
+    @rumps.timer(1 / 60)
+    def refresh_ui(self, _):
+        """Update icon and waveform overlay on the main thread, from the real recording state."""
         if not self.ready:
             return
+        self.overlay.update(core.recording, core.level)
         title = OFF if not self.enabled else REC if core.recording else IDLE
         if title != self.title:
             self.title = title
