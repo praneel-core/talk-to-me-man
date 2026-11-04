@@ -54,7 +54,7 @@ class DictateApp(rumps.App):
         """Update icon and waveform overlay on the main thread, from the real recording state."""
         if not self.ready:
             return
-        self.overlay.update(core.recording, core.level)
+        self.overlay.update(core.recording, core.level, core.pending > 0, core.done_count)
         title = OFF if not self.enabled else REC if core.recording else IDLE
         if title != self.title:
             self.title = title
