@@ -5,19 +5,20 @@ from AppKit import (
     NSColor,
     NSCompositingOperationDestinationOut,
     NSCompositingOperationSourceOver,
+    NSFontWeightBlack,
     NSFontWeightRegular,
     NSImage,
     NSImageSymbolConfiguration,
 )
 
 
-def symbol(name: str):
+def symbol(name: str, weight=NSFontWeightRegular):
     """An SF Symbol as a template image, or None if unavailable (old macOS)."""
     try:
         img = NSImage.imageWithSystemSymbolName_accessibilityDescription_(name, None)
         if img is None:
             return None
-        cfg = NSImageSymbolConfiguration.configurationWithPointSize_weight_(13, NSFontWeightRegular)
+        cfg = NSImageSymbolConfiguration.configurationWithPointSize_weight_(13, weight)
         img = img.imageWithSymbolConfiguration_(cfg)
         img.setTemplate_(True)
         return img
@@ -34,9 +35,9 @@ def _centered(sym, canvas: float):
     return ((canvas - w) / 2, (canvas - h) / 2), (w, h)
 
 
-def framed(name: str):
+def framed(name: str, weight=NSFontWeightRegular):
     """The symbol at its natural size, centred on the shared canvas."""
-    sym = symbol(name)
+    sym = symbol(name, weight)
     if sym is None:
         return None
     img = NSImage.alloc().initWithSize_((CANVAS, CANVAS))
@@ -70,9 +71,9 @@ def knockout(name: str, badge: float = 16.0):
     return img
 
 
-# menu bar looks: state -> (SF Symbol, "plain" | "knockout"). Pick one in config.MENU_ICON.
+# menu bar looks: state -> (SF Symbol, "plain" | "bold" | "knockout"). Pick one in config.MENU_ICON.
 STYLES = {
-    "option": {"idle": ("option", "plain"), "rec": ("option", "knockout"), "off": ("option", "plain")},
+    "option": {"idle": ("option", "plain"), "rec": ("option", "bold"), "off": ("option", "plain")},
     "bubble": {"idle": ("text.bubble", "plain"), "rec": ("text.bubble.fill", "plain"), "off": ("text.bubble", "plain")},
     "waveform": {"idle": ("waveform", "plain"), "rec": ("waveform.circle.fill", "plain"), "off": ("waveform.slash", "plain")},
 }
@@ -83,4 +84,6 @@ def image_for(style: str, state: str):
     """Template image for a state ('loading' looks like idle), or None."""
     spec = ERROR if state == "error" else STYLES[style]["idle" if state == "loading" else state]
     name, mode = spec
-    return knockout(name) if mode == "knockout" else framed(name)
+    if mode == "knockout":
+        return knockout(name)
+    return framed(name, NSFontWeightBlack if mode == "bold" else NSFontWeightRegular)
