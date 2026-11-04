@@ -4,10 +4,6 @@ Free, unlimited, fully local push-to-talk dictation for Apple Silicon Macs.
 Hold **Right Option**, speak, release: the text is pasted into the focused app.
 No cloud, no subscription, nothing leaves your machine.
 
-![Demo: hold Right Option, speak, release: the text appears, with the self-correction resolved](docs/demo.gif)
-
-*Spoken: "Let's meet on Tuesday, no, Wednesday at three." Pasted: "Let's meet on Wednesday at 3."*
-
 - **Transcription:** [mlx-whisper](https://github.com/ml-explore/mlx-examples) (`whisper-large-v3-turbo`), fully on-device.
 - **Self-correction cleanup (optional):** a local [Ollama](https://ollama.com) model turns
   "Tuesday, no, Wednesday" into "Wednesday". It only runs when your sentence contains a correction cue.
