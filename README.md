@@ -22,6 +22,31 @@ No cloud, no subscription, nothing leaves your machine.
   starting, red = not running (self-correction cleanup is skipped). Hover it for a tooltip. The app loads the
   model for you as soon as Ollama comes up.
 
+## How it works
+
+What happens between pressing the key and seeing your text, in plain English, with the technology behind each step on the right.
+
+![What happens when you dictate, step by step, with the technology behind each step](docs/how-it-works.svg)
+
+### Libraries used
+
+| Library / tool | Used for |
+|---|---|
+| [`pynput`](https://pynput.readthedocs.io) | global hotkey listener (macOS event tap) and the simulated Cmd+V and Shift+Left key presses |
+| [`sounddevice`](https://python-sounddevice.readthedocs.io) | microphone capture through PortAudio / CoreAudio, 16 kHz mono float32 |
+| [`numpy`](https://numpy.org) | audio buffers, loudness (RMS) for the speech check and the waveform |
+| [`mlx-whisper`](https://github.com/ml-explore/mlx-examples/tree/main/whisper) | speech to text with `whisper-large-v3-turbo`, running on the Apple GPU via MLX |
+| [Ollama](https://ollama.com) (`qwen2.5:3b`) | optional local model that fixes spoken self-corrections, called over `localhost` with `urllib` |
+| [`pyperclip`](https://github.com/asweigart/pyperclip) | clipboard access (`pbcopy` / `pbpaste`) for pasting |
+| [`rumps`](https://github.com/jaredks/rumps) | the menu bar app and its menu |
+| PyObjC (`AppKit`, `Quartz`) | the floating waveform pill, SF Symbol menu bar icons, the status dot, permission checks |
+| `afplay` | the start and stop sounds |
+| Python standard library | `threading` and `queue` (worker thread, locks), `re` (cleanup and cue detection), `collections.deque` (recent dictations), `json` (settings) |
+
+**Threads:** the key listener only queues events; a worker thread opens and closes the mic; each recording is transcribed on its own thread behind a lock (MLX is not thread-safe); a monitor thread watches Ollama; the UI runs on the main thread.
+
+Regenerate the diagram with `python scripts/make_diagram.py` (it rewrites `docs/how-it-works.svg`).
+
 ## Requirements
 
 macOS on Apple Silicon, Python 3.10+, and (optional) Ollama with `qwen2.5:3b`.
@@ -79,7 +104,7 @@ talktomeman/
   icons.py          menu bar icons
   menubar.py        rumps menu bar app
   settings.py       saves menu choices (microphone, Smart cleanup) to ~/.config/talktomeman/settings.json
-scripts/            build_app.sh, make_icon.py
+scripts/            build_app.sh, make_icon.py, make_diagram.py (regenerates docs/how-it-works.svg)
 tests/              pytest suite for textproc
 dictate_menubar.py  legacy launcher path for an already-built Dictate.app; safe to delete after rebuilding it
 ```

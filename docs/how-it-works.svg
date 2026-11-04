@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 1524" width="940" height="1524" role="img" aria-label="What happens when you dictate: capture, understand, polish and deliver, with the technology behind each step"><style>
+:root{--bg:#f9fafb;--card:#ffffff;--border:#e4e7ec;--text:#101828;--sub:#667085;--chip:#f2f4f7;--chiptxt:#344054;--accent:#6d5efc;--accentsoft:#ece9ff;--shadow:rgba(16,24,40,.07)}
+text{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Inter,Helvetica,Arial,sans-serif}
+.card{fill:var(--card);stroke:var(--border);stroke-width:1;filter:url(#sh)}
+.band{fill:var(--card);stroke:var(--border);stroke-width:1.2;stroke-dasharray:6 5}
+.panel{fill:var(--bg);stroke:var(--border);stroke-width:1}
+.pill{fill:var(--accentsoft)}
+.pilltxt{font-size:12.5px;font-weight:600;fill:var(--accent)}
+.legend{font-size:11.5px;fill:var(--sub)}
+.hd{font-size:10.5px;font-weight:700;letter-spacing:1.6px;fill:var(--sub)}
+.phase{font-size:11px;font-weight:800;letter-spacing:2px;fill:var(--accent)}
+.rule{stroke:var(--border);stroke-width:1}
+.line{stroke:var(--accent);stroke-opacity:.28;stroke-width:2}
+.node{fill:var(--accent)}
+.nodetxt{font-size:12px;font-weight:700;fill:#fff}
+.tag{font-size:9.5px;font-weight:800;letter-spacing:1.4px;fill:var(--sub)}
+.tag-ONLYIF{fill:var(--accent)}
+.title{font-size:15px;font-weight:650;fill:var(--text)}
+.sub{font-size:12px;fill:var(--sub)}
+.mid{font-size:13px;fill:var(--text);fill-opacity:.88}
+.chip{fill:var(--chip)}
+.chiptxt{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;fill:var(--chiptxt)}
+.div{stroke:var(--border);stroke-width:1}
+</style><defs><filter id="sh" x="-5%" y="-10%" width="110%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#101828" flood-opacity="0.07"/></filter></defs>
+<rect class="panel" x="1" y="1" width="938" height="1522" rx="22"/>
+<path class="line" d="M48,183.0 L48,1369.0"/>
+<rect class="pill" x="24" y="24" width="446" height="30" rx="15"/>
+<text class="pilltxt" x="247" y="44" text-anchor="middle">Everything stays on your Mac: audio and text never leave it</text>
+<text class="legend" x="916" y="43" text-anchor="end">YOU: your action   ·   AUTOMATIC: the app does it   ·   ONLY IF: special cases</text>
+<text class="hd" x="100" y="82">WHAT YOU DO</text>
+<text class="hd" x="330" y="82">WHAT THE APP DOES</text>
+<text class="hd" x="684" y="82">WHAT RUNS IT</text>
+<text class="phase" x="28" y="114">CAPTURE</text>
+<path class="rule" d="M105,110 L916,110"/>
+<rect class="card" x="24" y="130" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="183.0" r="13"/>
+<text class="nodetxt" x="48" y="187.5" text-anchor="middle">1</text>
+<text class="tag tag-YOU" x="100" y="168.0">YOU</text>
+<text class="title" x="100" y="190.0">Hold Right Option</text>
+<text class="sub" x="100" y="206.0">and start talking</text>
+<text class="mid" x="330" y="167.0">The app notices the key press. It only leaves</text>
+<text class="mid" x="330" y="187.0">a note for a background worker, so your</text>
+<text class="mid" x="330" y="207.0">keyboard never lags.</text>
+<rect class="chip" x="684" y="172.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="713.7" y="187.0" text-anchor="middle">pynput</text>
+<rect class="chip" x="749.4" y="172.0" width="52.5" height="22" rx="11"/>
+<text class="chiptxt" x="775.65" y="187.0" text-anchor="middle">queue</text>
+<rect class="chip" x="807.9" y="172.0" width="80.1" height="22" rx="11"/>
+<text class="chiptxt" x="847.9499999999999" y="187.0" text-anchor="middle">threading</text>
+<path class="div" d="M312,148 L312,218"/>
+<path class="div" d="M666,148 L666,218"/>
+<rect class="card" x="24" y="250" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="303.0" r="13"/>
+<text class="nodetxt" x="48" y="307.5" text-anchor="middle">2</text>
+<text class="tag tag-YOU" x="100" y="288.0">YOU</text>
+<text class="title" x="100" y="310.0">Speak</text>
+<text class="sub" x="100" y="326.0">a small pill shows your voice</text>
+<text class="mid" x="330" y="287.0">The microphone records your voice and a soft</text>
+<text class="mid" x="330" y="307.0">“pop” plays. The bars in the pill move with</text>
+<text class="mid" x="330" y="327.0">how loud you are.</text>
+<rect class="chip" x="684" y="278.0" width="93.9" height="22" rx="11"/>
+<text class="chiptxt" x="730.95" y="293.0" text-anchor="middle">sounddevice</text>
+<rect class="chip" x="783.9" y="278.0" width="52.5" height="22" rx="11"/>
+<text class="chiptxt" x="810.15" y="293.0" text-anchor="middle">numpy</text>
+<rect class="chip" x="684" y="306.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="713.7" y="321.0" text-anchor="middle">AppKit</text>
+<rect class="chip" x="749.4" y="306.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="779.1" y="321.0" text-anchor="middle">afplay</text>
+<path class="div" d="M312,268 L312,338"/>
+<path class="div" d="M666,268 L666,338"/>
+<text class="phase" x="28" y="386">UNDERSTAND</text>
+<path class="rule" d="M132,382 L916,382"/>
+<rect class="card" x="24" y="402" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="455.0" r="13"/>
+<text class="nodetxt" x="48" y="459.5" text-anchor="middle">3</text>
+<text class="tag tag-YOU" x="100" y="440.0">YOU</text>
+<text class="title" x="100" y="462.0">Let go of the key</text>
+<text class="sub" x="100" y="478.0">the pill shows it is thinking</text>
+<text class="mid" x="330" y="439.0">The microphone stops and a soft “tink” plays.</text>
+<text class="mid" x="330" y="459.0">The recording stays in memory. It is never</text>
+<text class="mid" x="330" y="479.0">saved or sent anywhere.</text>
+<rect class="chip" x="684" y="444.0" width="52.5" height="22" rx="11"/>
+<text class="chiptxt" x="710.25" y="459.0" text-anchor="middle">numpy</text>
+<rect class="chip" x="742.5" y="444.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="772.2" y="459.0" text-anchor="middle">afplay</text>
+<rect class="chip" x="807.9" y="444.0" width="80.1" height="22" rx="11"/>
+<text class="chiptxt" x="847.9499999999999" y="459.0" text-anchor="middle">threading</text>
+<path class="div" d="M312,420 L312,490"/>
+<path class="div" d="M666,420 L666,490"/>
+<rect class="card" x="24" y="522" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="575.0" r="13"/>
+<text class="nodetxt" x="48" y="579.5" text-anchor="middle">4</text>
+<text class="tag tag-AUTOMATIC" x="100" y="560.0">AUTOMATIC</text>
+<text class="title" x="100" y="582.0">Did you say anything?</text>
+<text class="sub" x="100" y="598.0">silence is ignored</text>
+<text class="mid" x="330" y="559.0">The audio is checked in tiny 30 ms slices.</text>
+<text class="mid" x="330" y="579.0">Silence or background noise stops here, so the</text>
+<text class="mid" x="330" y="599.0">transcriber cannot make up words.</text>
+<rect class="chip" x="684" y="564.0" width="52.5" height="22" rx="11"/>
+<text class="chiptxt" x="710.25" y="579.0" text-anchor="middle">numpy</text>
+<path class="div" d="M312,540 L312,610"/>
+<path class="div" d="M666,540 L666,610"/>
+<rect class="card" x="24" y="642" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="695.0" r="13"/>
+<text class="nodetxt" x="48" y="699.5" text-anchor="middle">5</text>
+<text class="tag tag-AUTOMATIC" x="100" y="680.0">AUTOMATIC</text>
+<text class="title" x="100" y="702.0">Speech becomes text</text>
+<text class="sub" x="100" y="718.0">on your Mac, offline</text>
+<text class="mid" x="330" y="679.0">The Whisper AI model runs on your Mac’s chip.</text>
+<text class="mid" x="330" y="699.0">Your personal word list helps it spell names</text>
+<text class="mid" x="330" y="719.0">and jargon correctly.</text>
+<rect class="chip" x="684" y="670.0" width="93.9" height="22" rx="11"/>
+<text class="chiptxt" x="730.95" y="685.0" text-anchor="middle">mlx-whisper</text>
+<rect class="chip" x="783.9" y="670.0" width="38.7" height="22" rx="11"/>
+<text class="chiptxt" x="803.25" y="685.0" text-anchor="middle">MLX</text>
+<rect class="chip" x="684" y="698.0" width="169.8" height="22" rx="11"/>
+<text class="chiptxt" x="768.9" y="713.0" text-anchor="middle">whisper-large-v3-turbo</text>
+<path class="div" d="M312,660 L312,730"/>
+<path class="div" d="M666,660 L666,730"/>
+<text class="phase" x="28" y="778">POLISH</text>
+<path class="rule" d="M96,774 L916,774"/>
+<rect class="card" x="24" y="794" width="892" height="96" rx="16"/>
+<circle class="node" cx="48" cy="842.0" r="13"/>
+<text class="nodetxt" x="48" y="846.5" text-anchor="middle">6</text>
+<text class="tag tag-AUTOMATIC" x="100" y="827.0">AUTOMATIC</text>
+<text class="title" x="100" y="849.0">Quick tidy</text>
+<text class="sub" x="100" y="865.0">simple rules</text>
+<text class="mid" x="330" y="836.0">Removes “um” and “uh”, fixes spacing and</text>
+<text class="mid" x="330" y="856.0">capitalises the first letter.</text>
+<rect class="chip" x="684" y="831.0" width="31.8" height="22" rx="11"/>
+<text class="chiptxt" x="699.9" y="846.0" text-anchor="middle">re</text>
+<path class="div" d="M312,812 L312,872"/>
+<path class="div" d="M666,812 L666,872"/>
+<rect class="card" x="24" y="904" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="957.0" r="13"/>
+<text class="nodetxt" x="48" y="961.5" text-anchor="middle">7</text>
+<text class="tag tag-ONLYIF" x="100" y="942.0">ONLY IF</text>
+<text class="title" x="100" y="964.0">You said just “comma”</text>
+<text class="sub" x="100" y="980.0">or “full stop”, “quotes”…</text>
+<text class="mid" x="330" y="941.0">Instead of adding new text, the app fixes the</text>
+<text class="mid" x="330" y="961.0">punctuation of what you dictated a moment ago</text>
+<text class="mid" x="330" y="981.0">(within 2 minutes).</text>
+<rect class="chip" x="684" y="946.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="713.7" y="961.0" text-anchor="middle">pynput</text>
+<rect class="chip" x="749.4" y="946.0" width="73.2" height="22" rx="11"/>
+<text class="chiptxt" x="786.0" y="961.0" text-anchor="middle">textproc</text>
+<path class="div" d="M312,922 L312,992"/>
+<path class="div" d="M666,922 L666,992"/>
+<rect class="card" x="24" y="1024" width="892" height="126" rx="16"/>
+<circle class="node" cx="48" cy="1087.0" r="13"/>
+<text class="nodetxt" x="48" y="1091.5" text-anchor="middle">8</text>
+<text class="tag tag-ONLYIF" x="100" y="1072.0">ONLY IF</text>
+<text class="title" x="100" y="1094.0">You corrected yourself</text>
+<text class="sub" x="100" y="1110.0">“Tuesday, no, Wednesday”</text>
+<text class="mid" x="330" y="1061.0">A small AI on your Mac (Ollama) removes the</text>
+<text class="mid" x="330" y="1081.0">mistake and changes nothing else. If it</text>
+<text class="mid" x="330" y="1101.0">rewords too much, or Ollama is off, your text</text>
+<text class="mid" x="330" y="1121.0">is kept as it is.</text>
+<rect class="chip" x="684" y="1062.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="713.7" y="1077.0" text-anchor="middle">urllib</text>
+<rect class="chip" x="749.4" y="1062.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="779.1" y="1077.0" text-anchor="middle">Ollama</text>
+<rect class="chip" x="684" y="1090.0" width="87.0" height="22" rx="11"/>
+<text class="chiptxt" x="727.5" y="1105.0" text-anchor="middle">qwen2.5:3b</text>
+<rect class="chip" x="777.0" y="1090.0" width="31.8" height="22" rx="11"/>
+<text class="chiptxt" x="792.9" y="1105.0" text-anchor="middle">re</text>
+<path class="div" d="M312,1042 L312,1132"/>
+<path class="div" d="M666,1042 L666,1132"/>
+<text class="phase" x="28" y="1180">DELIVER</text>
+<path class="rule" d="M105,1176 L916,1176"/>
+<rect class="card" x="24" y="1196" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="1249.0" r="13"/>
+<text class="nodetxt" x="48" y="1253.5" text-anchor="middle">9</text>
+<text class="tag tag-AUTOMATIC" x="100" y="1234.0">AUTOMATIC</text>
+<text class="title" x="100" y="1256.0">Text appears</text>
+<text class="sub" x="100" y="1272.0">right where your cursor is</text>
+<text class="mid" x="330" y="1233.0">The text is copied, pasted with Cmd+V into the</text>
+<text class="mid" x="330" y="1253.0">app you are using, and your previous clipboard</text>
+<text class="mid" x="330" y="1273.0">is put back.</text>
+<rect class="chip" x="684" y="1238.0" width="80.1" height="22" rx="11"/>
+<text class="chiptxt" x="724.05" y="1253.0" text-anchor="middle">pyperclip</text>
+<rect class="chip" x="770.1" y="1238.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="799.8000000000001" y="1253.0" text-anchor="middle">pynput</text>
+<path class="div" d="M312,1214 L312,1284"/>
+<path class="div" d="M666,1214 L666,1284"/>
+<rect class="card" x="24" y="1316" width="892" height="106" rx="16"/>
+<circle class="node" cx="48" cy="1369.0" r="13"/>
+<text class="nodetxt" x="48" y="1373.5" text-anchor="middle">10</text>
+<text class="tag tag-AUTOMATIC" x="100" y="1354.0">AUTOMATIC</text>
+<text class="title" x="100" y="1376.0">A check mark confirms</text>
+<text class="sub" x="100" y="1392.0">then the pill fades away</text>
+<text class="mid" x="330" y="1353.0">The text is also added to Recent dictations in</text>
+<text class="mid" x="330" y="1373.0">the menu (kept in memory only, gone when the</text>
+<text class="mid" x="330" y="1393.0">app quits).</text>
+<rect class="chip" x="684" y="1358.0" width="59.400000000000006" height="22" rx="11"/>
+<text class="chiptxt" x="713.7" y="1373.0" text-anchor="middle">AppKit</text>
+<rect class="chip" x="749.4" y="1358.0" width="52.5" height="22" rx="11"/>
+<text class="chiptxt" x="775.65" y="1373.0" text-anchor="middle">deque</text>
+<path class="div" d="M312,1334 L312,1404"/>
+<path class="div" d="M666,1334 L666,1404"/>
+<rect class="band" x="24" y="1442" width="892" height="58" rx="16"/>
+<text class="phase" x="48" y="1466">ALWAYS RUNNING IN THE BACKGROUND</text>
+<text class="mid" x="48" y="1486">Watches whether Ollama is ready (checks every 3 seconds, loads the model when it appears) and shows the dot on the menu bar icon.</text>
+</svg>
