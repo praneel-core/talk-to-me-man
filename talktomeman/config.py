@@ -4,6 +4,8 @@ from pathlib import Path
 
 from pynput import keyboard
 
+from . import settings
+
 # --- hotkey / audio ---
 HOTKEY = keyboard.Key.alt_r  # hold to talk (right Option)
 SAMPLE_RATE = 16000
@@ -97,3 +99,9 @@ CUSTOM_WORDS = load_custom_words()
 # a bare word list makes it drop commas.
 PROMPT_PREFIX = "Hello, welcome. Let's get started, shall we? I use these words: "
 WHISPER_PROMPT = PROMPT_PREFIX + ", ".join(CUSTOM_WORDS) + "."
+
+
+# --- choices saved from the menu bar (see settings.py) ---
+_saved = settings.load()
+USE_LLM = bool(_saved.get("use_llm", USE_LLM))
+INPUT_DEVICE = _saved.get("input_device")  # microphone name; None = system default
